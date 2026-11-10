@@ -1,0 +1,43 @@
+<h2>Reportes de progreso</h2>
+
+<div class="filtros">
+  <input type="number" placeholder="ID del estudiante" [(ngModel)]="idEstudiante">
+  <button (click)="filtrarEstudiante()">Filtrar por estudiante</button>
+  <input type="number" placeholder="ID del tutor" [(ngModel)]="idTutor">
+  <button (click)="filtrarTutor()">Filtrar por tutor</button>
+  <button (click)="listar()">Ver todos</button>
+</div>
+
+<p class="mensaje">{{ mensaje }}</p>
+
+<div class="tabla">
+  <table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="A">
+      <th mat-header-cell *matHeaderCellDef> Id </th>
+      <td mat-cell *matCellDef="let e"> {{e.idReporte}} </td>
+    </ng-container>
+    <ng-container matColumnDef="B">
+      <th mat-header-cell *matHeaderCellDef> Sesión </th>
+      <td mat-cell *matCellDef="let e"> {{e.idSesion}} </td>
+    </ng-container>
+    <ng-container matColumnDef="C">
+      <th mat-header-cell *matHeaderCellDef> Tutor </th>
+      <td mat-cell *matCellDef="let e"> {{e.nombreTutor}} </td>
+    </ng-container>
+    <ng-container matColumnDef="D">
+      <th mat-header-cell *matHeaderCellDef> Fecha </th>
+      <td mat-cell *matCellDef="let e"> {{e.fechaReporte | date:'dd/MM/yyyy HH:mm'}} </td>
+    </ng-container>
+    <ng-container matColumnDef="E">
+      <th mat-header-cell *matHeaderCellDef> Progreso </th>
+      <td mat-cell *matCellDef="let e"> {{e.progreso}} </td>
+    </ng-container>
+    <ng-container matColumnDef="F">
+      <th mat-header-cell *matHeaderCellDef> Observaciones </th>
+      <td mat-cell *matCellDef="let e"> {{e.observaciones}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
