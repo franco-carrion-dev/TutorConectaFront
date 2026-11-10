@@ -1,0 +1,15 @@
+<h2>Registrar disponibilidad</h2>
+<form [formGroup]="form" (ngSubmit)="guardar()">
+  <label>ID del tutor <input type="number" formControlName="idTutor"></label>
+  <label>Día
+    <select formControlName="diaSemana">
+      <option value="">Selecciona…</option>
+      <option>Lunes</option><option>Martes</option><option>Miércoles</option>
+      <option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option>
+    </select>
+  </label>
+  <label>Hora de inicio <input type="time" formControlName="horaInicio"></label>
+  <label>Hora de fin <input type="time" formControlName="horaFin"></label>
+  <button type="submit">Guardar</button>
+  <p>{{ mensaje }}</p>
+</form>

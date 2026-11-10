@@ -1,0 +1,15 @@
+<h2>Registrar reporte de progreso</h2>
+
+<form [formGroup]="form" (ngSubmit)="guardar()">
+  <label>ID de la sesión
+    <input type="number" formControlName="idSesion" placeholder="Ej. 12">
+  </label>
+  <label>Progreso
+    <input type="text" formControlName="progreso" placeholder="Ej. Avance alto en derivadas">
+  </label>
+  <label>Observaciones
+    <textarea formControlName="observaciones" placeholder="Escribe tus observaciones sobre la sesión"></textarea>
+  </label>
+  <button type="submit">Guardar reporte</button>
+  <p>{{ mensaje }}</p>
+</form>
