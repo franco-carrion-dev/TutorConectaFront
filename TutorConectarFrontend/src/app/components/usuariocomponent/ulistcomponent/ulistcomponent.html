@@ -1,0 +1,53 @@
+<h2>Usuarios</h2>
+
+<div class="filtros">
+  <input type="text" placeholder="Nombre del tutor" [(ngModel)]="nombreTutor">
+  <button (click)="filtrarTutor()">Buscar tutor</button>
+
+  <input type="text" placeholder="Rol (ADMIN, TUTOR, ESTUDIANTE)" [(ngModel)]="rol">
+  <button (click)="filtrarRol()">Filtrar por rol</button>
+
+  <button (click)="listar()">Ver todos</button>
+</div>
+
+<p class="mensaje">{{ mensaje }}</p>
+
+<div class="tabla">
+  <table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="A">
+      <th mat-header-cell *matHeaderCellDef> Id </th>
+      <td mat-cell *matCellDef="let e"> {{e.idUsuario}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="B">
+      <th mat-header-cell *matHeaderCellDef> Nombre </th>
+      <td mat-cell *matCellDef="let e"> {{e.nombre}} {{e.apellido}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="C">
+      <th mat-header-cell *matHeaderCellDef> Correo </th>
+      <td mat-cell *matCellDef="let e"> {{e.email}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="D">
+      <th mat-header-cell *matHeaderCellDef> Rol </th>
+      <td mat-cell *matCellDef="let e"> {{e.denominacionRol || (e.idRol === 1 ? 'ADMIN' : e.idRol === 2 ? 'TUTOR' : 'ESTUDIANTE')}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="E">
+      <th mat-header-cell *matHeaderCellDef> Estado </th>
+      <td mat-cell *matCellDef="let e"> {{e.activo ? 'Activo' : 'Suspendido'}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="F">
+      <th mat-header-cell *matHeaderCellDef> Acciones </th>
+      <td mat-cell *matCellDef="let e">
+        <button [routerLink]="['ediciones', e.idUsuario]">Editar</button>
+        <button (click)="eliminar(e.idUsuario)">Eliminar</button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
