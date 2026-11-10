@@ -1,0 +1,35 @@
+<h2>{{ edicion ? 'Editar usuario' : 'Registrar usuario' }}</h2>
+
+<div class="formulario">
+  <label>Nombres</label>
+  <input type="text" placeholder="Nombres" [(ngModel)]="usuario.nombre">
+
+  <label>Apellidos</label>
+  <input type="text" placeholder="Apellidos" [(ngModel)]="usuario.apellido">
+
+  <label>Correo electrónico</label>
+  <input type="email" placeholder="nombre@correo.com" [(ngModel)]="usuario.email">
+
+  <label>Contraseña</label>
+  <input type="password" placeholder="Contraseña" [(ngModel)]="usuario.password">
+
+  <label>Rol</label>
+  <select [(ngModel)]="usuario.idRol">
+    <option [ngValue]="1">ADMIN</option>
+    <option [ngValue]="2">TUTOR</option>
+    <option [ngValue]="3">ESTUDIANTE</option>
+  </select>
+
+  <label>Activo</label>
+  <select [(ngModel)]="usuario.activo">
+    <option [ngValue]="true">Sí</option>
+    <option [ngValue]="false">No</option>
+  </select>
+
+  <p class="mensaje">{{ mensaje }}</p>
+
+  <div class="acciones">
+    <button (click)="aceptar()">Guardar</button>
+    <button routerLink="/usuarios">Cancelar</button>
+  </div>
+</div>
