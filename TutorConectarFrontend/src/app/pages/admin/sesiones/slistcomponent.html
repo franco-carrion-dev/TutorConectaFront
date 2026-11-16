@@ -1,0 +1,55 @@
+<div class="page-head">
+  <div><h2>Sesiones de tutoría</h2><p>Agendadas, realizadas y canceladas</p></div>
+  <a class="btn" routerLink="/admin/sesiones/nuevo"><span class="material-icons">add</span>Registrar sesión</a>
+</div>
+<div class="filtros">
+  <label class="campo corto">Estado
+    <select [(ngModel)]="estado" (ngModelChange)="filtrar()">
+      <option value="">Todos</option>
+      @for (e of estados; track e) { <option [value]="e">{{ e | etiqueta }}</option> }
+    </select>
+  </label>
+  <label class="campo">Tutor
+    <select [(ngModel)]="idTutor" (ngModelChange)="filtrar()">
+      <option [ngValue]="null">Todos</option>
+      @for (t of d.tutores; track t.idTutor) { <option [ngValue]="t.idTutor">{{ d.nombre(t.idUsuario) }}</option> }
+    </select>
+  </label>
+  <label class="campo">Materia
+    <select [(ngModel)]="idMateria" (ngModelChange)="filtrar()">
+      <option [ngValue]="null">Todas</option>
+      @for (m of d.materias; track m.idMateria) { <option [ngValue]="m.idMateria">{{ m.nombre }}</option> }
+    </select>
+  </label>
+  <label class="campo corto">Desde<input type="date" [(ngModel)]="desde" (ngModelChange)="filtrar()"></label>
+  <label class="campo corto">Hasta<input type="date" [(ngModel)]="hasta" (ngModelChange)="filtrar()"></label>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>#</th><th>Fecha</th><th>Materia</th><th>Tutor</th><th>Estudiante</th><th>Pago</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      @for (s of lista; track s.idSesion) {
+        <tr>
+          <td>{{ s.idSesion }}</td>
+          <td>{{ s.fechaInicio | date:'dd/MM/yy HH:mm' }}<span class="muted small"> – {{ s.fechaFin | date:'HH:mm' }}</span></td>
+          <td>{{ d.nombreMateria(s.idMateria) }}</td>
+          <td>{{ d.nombre(s.idTutor) }}</td>
+          <td>{{ d.nombre(s.idEstudiante) }}</td>
+          <td>@if (d.pagada(s.idSesion)) { <span class="chip ok">Pagada</span> } @else { <span class="muted small">—</span> }</td>
+          <td>
+            <select style="height:32px;min-width:150px" [ngModel]="s.estado" (ngModelChange)="cambiarEstado(s, $event)">
+              @for (e of estados; track e) { <option [value]="e">{{ e | etiqueta }}</option> }
+            </select>
+          </td>
+          <td class="acc">
+            @if (s.enlaceJitsi) { <a class="icon-btn" [routerLink]="['/sala', s.idSesion]" title="Videollamada"><span class="material-icons">videocam</span></a> }
+            <a class="icon-btn" [routerLink]="['/admin/sesiones/editar', s.idSesion]" title="Editar"><span class="material-icons">edit</span></a>
+            <button class="icon-btn rojo" (click)="eliminar(s)" title="Eliminar"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="8"><div class="vacio"><span class="material-icons">event</span>{{ cargando ? 'Cargando...' : 'No hay sesiones' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>

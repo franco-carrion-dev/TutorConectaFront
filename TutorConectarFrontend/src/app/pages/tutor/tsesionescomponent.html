@@ -1,0 +1,37 @@
+<div class="page-head">
+  <div><h2>Mis sesiones</h2><p>Únete a la videollamada, marca las sesiones realizadas y reporta el progreso</p></div>
+</div>
+<div class="acciones" style="margin-bottom:16px">
+  <button class="btn sm" [class.sec]="tab !== 'proximas'" (click)="tab = 'proximas'">Próximas</button>
+  <button class="btn sm" [class.sec]="tab !== 'pendientes'" (click)="tab = 'pendientes'">Por cerrar</button>
+  <button class="btn sm" [class.sec]="tab !== 'historial'" (click)="tab = 'historial'">Historial</button>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>Fecha</th><th>Materia</th><th>Estudiante</th><th>Pago</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      @for (s of lista; track s.idSesion) {
+        <tr>
+          <td><strong>{{ s.fechaInicio | date:'EEE dd/MM/yy' }}</strong><div class="small muted">{{ s.fechaInicio | date:'HH:mm' }} – {{ s.fechaFin | date:'HH:mm' }}</div></td>
+          <td>{{ d.nombreMateria(s.idMateria) }}</td>
+          <td>{{ d.nombre(s.idEstudiante) }}</td>
+          <td>@if (d.pagada(s.idSesion)) { <span class="chip ok">Pagada</span> } @else { <span class="chip warn">Sin pago</span> }</td>
+          <td><span class="chip" [class]="s.estado">{{ s.estado | etiqueta }}</span></td>
+          <td class="acc">
+            @if (s.estado === 'agendada') {
+              <a class="btn sm" [class.exito]="puedeUnirse(s)" [class.sec]="!puedeUnirse(s)" [routerLink]="['/sala', s.idSesion]"><span class="material-icons">videocam</span>Unirse</a>
+              <button class="btn sm sec" (click)="estado(s, 'realizada')">Marcar realizada</button>
+              <button class="icon-btn rojo" (click)="estado(s, 'cancelada')" title="Cancelar"><span class="material-icons">event_busy</span></button>
+            }
+            @if (s.estado === 'realizada') {
+              @if (tieneReporte(s)) { <span class="chip ok">Reporte registrado</span> }
+              @else { <a class="btn sm acento" routerLink="/tutor/reportes/nuevo" [queryParams]="{ sesion: s.idSesion }">Registrar reporte</a> }
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="6"><div class="vacio"><span class="material-icons">event</span>{{ cargando ? 'Cargando...' : 'No hay sesiones en esta pestaña' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>

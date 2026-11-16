@@ -1,0 +1,65 @@
+<div class="page-head">
+  <div><h2>Mis sesiones</h2><p>Paga, únete a la videollamada, cancela o califica a tu tutor</p></div>
+  <a class="btn" routerLink="/estudiante/buscar"><span class="material-icons">add</span>Agendar nueva</a>
+</div>
+<div class="acciones" style="margin-bottom:16px">
+  <button class="btn sm" [class.sec]="tab !== 'proximas'" (click)="tab = 'proximas'">Próximas ({{ proximas.length }})</button>
+  <button class="btn sm" [class.sec]="tab !== 'historial'" (click)="tab = 'historial'">Historial ({{ historial.length }})</button>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>Fecha</th><th>Materia</th><th>Tutor</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      @for (s of lista; track s.idSesion) {
+        <tr>
+          <td><strong>{{ s.fechaInicio | date:'EEE dd/MM/yy' }}</strong><div class="small muted">{{ s.fechaInicio | date:'HH:mm' }} – {{ s.fechaFin | date:'HH:mm' }}</div></td>
+          <td>{{ d.nombreMateria(s.idMateria) }}</td>
+          <td>{{ d.nombre(s.idTutor) }}</td>
+          <td><span class="chip" [class]="s.estado">{{ s.estado | etiqueta }}</span>
+            @if (s.estado === 'realizada' && d.calificada(s.idSesion)) { <span class="chip ok">Calificada</span> }</td>
+          <td class="acc">
+            @if (s.estado === 'pendiente_pago') { <a class="btn sm acento" [routerLink]="['/estudiante/pago', s.idSesion]">Pagar</a> }
+            @if (s.estado === 'agendada') {
+              <a class="btn sm" [class.exito]="puedeUnirse(s)" [class.sec]="!puedeUnirse(s)" [routerLink]="['/sala', s.idSesion]"><span class="material-icons">videocam</span>Unirse</a>
+            }
+            @if (s.estado === 'realizada' && !d.calificada(s.idSesion)) { <button class="btn sm acento" (click)="abrirCalificar(s)"><span class="material-icons">star</span>Calificar</button> }
+            @if (s.estado === 'realizada' && reportesDe(s).length) { <button class="btn sm sec" (click)="viendo = s">Ver reporte</button> }
+            @if (s.estado === 'agendada' || s.estado === 'pendiente_pago') {
+              <button class="icon-btn rojo" (click)="cancelar(s)" title="Cancelar sesión"><span class="material-icons">event_busy</span></button>
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="5"><div class="vacio"><span class="material-icons">event</span>{{ cargando ? 'Cargando...' : 'No hay sesiones aquí' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (calificando) {
+  <div class="overlay" (click)="calificando = null">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Califica a {{ d.nombre(calificando.idTutor) }}</h3>
+      <p class="small muted" style="margin-bottom:12px">{{ d.nombreMateria(calificando.idMateria) }} · {{ calificando.fechaInicio | date:'dd/MM/yy' }}</p>
+      <div class="stars" style="justify-content:center;margin-bottom:12px">
+        @for (n of [1,2,3,4,5]; track n) { <button type="button" class="star" [class.on]="n <= cal.puntuacion" (click)="cal.puntuacion = n">★</button> }
+      </div>
+      <label class="campo">Comentario (opcional)<textarea [(ngModel)]="cal.comentario" placeholder="¿Qué tal estuvo la clase?"></textarea></label>
+      <div class="pie"><button class="btn sec" (click)="calificando = null">Cancelar</button><button class="btn" (click)="enviarCalificacion()">Enviar</button></div>
+    </div>
+  </div>
+}
+
+@if (viendo) {
+  <div class="overlay" (click)="viendo = null">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Reporte de progreso</h3>
+      @for (r of reportesDe(viendo); track r.idReporte) {
+        <div class="item" style="align-items:flex-start"><div class="txt">
+          <strong>{{ r.progreso }}</strong><span class="small muted">{{ r.fechaReporte | date:'dd/MM/yy' }} · {{ r.nombreTutor || d.nombre(r.idTutor) }}</span>
+          <p style="margin-top:6px;white-space:pre-line">{{ r.observaciones }}</p></div></div>
+      }
+      <div class="pie"><button class="btn" (click)="viendo = null">Cerrar</button></div>
+    </div>
+  </div>
+}
