@@ -1,0 +1,54 @@
+<div class="page-head">
+  <div><h2>Pagos y disputas</h2><p>Transacciones de las sesiones de tutoría</p></div>
+  <a class="btn" routerLink="/admin/pagos/nuevo"><span class="material-icons">add</span>Registrar pago</a>
+</div>
+<div class="kpis">
+  <div class="kpi"><div class="lbl"><span class="material-icons">receipt_long</span>Pagos listados</div><div class="val">{{ lista.length }}</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">payments</span>Total completado</div><div class="val">{{ total | currency:'PEN':'S/ ' }}</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">gavel</span>Disputas abiertas</div><div class="val" [style.color]="disputas ? 'var(--warn-700)' : ''">{{ disputas }}</div></div>
+</div>
+<div class="filtros">
+  <label class="campo corto">Estado
+    <select [(ngModel)]="estado" (ngModelChange)="buscar()">
+      <option value="">Todos</option>
+      @for (e of estados; track e) { <option [value]="e">{{ e | etiqueta }}</option> }
+    </select>
+  </label>
+  <label class="campo">Tutor
+    <select [(ngModel)]="idTutor" (ngModelChange)="buscar()">
+      <option [ngValue]="null">Todos</option>
+      @for (t of d.tutores; track t.idTutor) { <option [ngValue]="t.idTutor">{{ d.nombre(t.idUsuario) }}</option> }
+    </select>
+  </label>
+  <button class="btn sec" (click)="estado='EN_DISPUTA'; buscar()"><span class="material-icons">gavel</span>Ver disputas</button>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>#</th><th>Fecha</th><th>Sesión</th><th>Tutor</th><th>Estudiante</th><th>Método</th><th class="num">Monto</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      @for (p of lista; track p.idPago) {
+        @let s = d.sesion(p.idSesion);
+        <tr>
+          <td>{{ p.idPago }}</td>
+          <td>{{ p.fechaPago | date:'dd/MM/yy HH:mm' }}</td>
+          <td>#{{ p.idSesion }} <span class="small muted">{{ d.nombreMateria(s?.idMateria) }}</span></td>
+          <td>{{ p.nombreTutor || d.nombre(s?.idTutor) }}</td>
+          <td>{{ d.nombre(s?.idEstudiante) }}</td>
+          <td class="small">{{ p.metodoPago }}</td>
+          <td class="num">{{ p.monto | currency:'PEN':'S/ ' }}</td>
+          <td><span class="chip" [class]="p.estado">{{ p.estado | etiqueta }}</span></td>
+          <td class="acc">
+            @if (p.estado === 'EN_DISPUTA') {
+              <button class="btn sm" (click)="cambiar(p, 'REEMBOLSADO')">Reembolsar</button>
+              <button class="btn sm sec" (click)="cambiar(p, 'COMPLETADO')">Rechazar disputa</button>
+            }
+            <a class="icon-btn" [routerLink]="['/admin/pagos/editar', p.idPago]" title="Editar"><span class="material-icons">edit</span></a>
+            <button class="icon-btn rojo" (click)="eliminar(p)" title="Eliminar"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="9"><div class="vacio"><span class="material-icons">payments</span>{{ cargando ? 'Cargando...' : 'No hay pagos' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,30 @@
+<div class="page-head">
+  <div><h2>{{ id ? 'Editar pago #' + id : 'Registrar pago' }}</h2><p>Monto, método y estado de la transacción</p></div>
+  <a class="btn sec" routerLink="/admin/pagos"><span class="material-icons">arrow_back</span>Volver</a>
+</div>
+<div class="card">
+  <form class="form" (ngSubmit)="aceptar()">
+    <label class="campo">Sesión *
+      <select name="ses" [(ngModel)]="p.idSesion" (ngModelChange)="sugerir()" required>
+        <option [ngValue]="0" disabled>Selecciona</option>
+        @for (s of d.sesiones; track s.idSesion) {
+          <option [ngValue]="s.idSesion">#{{ s.idSesion }} · {{ d.nombreMateria(s.idMateria) }} · {{ d.nombre(s.idEstudiante) }} · {{ s.fechaInicio | date:'dd/MM HH:mm' }}</option>
+        }
+      </select>
+    </label>
+    <div class="fila">
+      <label class="campo">Monto (S/) *<input type="number" min="0" step="0.01" name="monto" [(ngModel)]="p.monto"></label>
+      <label class="campo">Fecha de pago *<input type="datetime-local" name="fecha" [(ngModel)]="p.fechaPago"></label>
+    </div>
+    <div class="fila">
+      <label class="campo">Método
+        <select name="met" [(ngModel)]="p.metodoPago">@for (m of metodos; track m) { <option [value]="m">{{ m }}</option> }</select>
+      </label>
+      <label class="campo">Estado *
+        <select name="est" [(ngModel)]="p.estado">@for (e of estados; track e) { <option [value]="e">{{ e | etiqueta }}</option> }</select>
+      </label>
+    </div>
+    @if (error) { <div class="aviso error">{{ error }}</div> }
+    <div class="acciones"><button class="btn" type="submit">Guardar</button><a class="btn sec" routerLink="/admin/pagos">Cancelar</a></div>
+  </form>
+</div>

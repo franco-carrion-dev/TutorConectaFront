@@ -1,0 +1,25 @@
+<div class="page-head">
+  <div><h2>Mis pagos</h2><p>Total pagado: <strong>{{ total | currency:'PEN':'S/ ' }}</strong></p></div>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>Fecha</th><th>Sesión</th><th>Tutor</th><th>Método</th><th class="num">Monto</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      @for (p of lista; track p.idPago) {
+        @let s = d.sesion(p.idSesion);
+        <tr>
+          <td>{{ p.fechaPago | date:'dd/MM/yy HH:mm' }}</td>
+          <td>{{ d.nombreMateria(s?.idMateria) }} <span class="small muted">· {{ s?.fechaInicio | date:'dd/MM' }}</span></td>
+          <td>{{ p.nombreTutor || d.nombre(s?.idTutor) }}</td>
+          <td class="small">{{ p.metodoPago }}</td>
+          <td class="num">{{ p.monto | currency:'PEN':'S/ ' }}</td>
+          <td><span class="chip" [class]="p.estado">{{ p.estado | etiqueta }}</span></td>
+          <td class="acc">@if (p.estado === 'COMPLETADO') { <button class="btn sm sec" (click)="reportar(p)">Reportar problema</button> }</td>
+        </tr>
+      } @empty {
+        <tr><td colspan="7"><div class="vacio"><span class="material-icons">receipt_long</span>{{ cargando ? 'Cargando...' : 'Aún no tienes pagos' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>
+<p class="small muted" style="margin-top:12px">¿Tienes una sesión pendiente de pago? <a routerLink="/estudiante/sesiones">Ve a Mis sesiones</a>.</p>
