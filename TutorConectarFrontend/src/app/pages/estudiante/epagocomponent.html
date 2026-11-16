@@ -1,0 +1,69 @@
+<div class="page-head">
+  <div><h2>Pago de la sesión</h2><p>La sesión se confirma cuando el pago es aprobado</p></div>
+  <a class="btn sec sm" routerLink="/estudiante/sesiones"><span class="material-icons">arrow_back</span>Mis sesiones</a>
+</div>
+
+@if (!s) { <div class="card vacio"><span class="material-icons">search_off</span>No encontramos esta sesión.</div> }
+@else {
+  <div class="grid-2" style="align-items:start">
+    <div class="card">
+      <h3>Resumen</h3>
+      <div class="resumen">
+        <div><span class="muted">Materia</span><strong>{{ d.nombreMateria(s.idMateria) }}</strong></div>
+        <div><span class="muted">Tutor</span><strong>{{ d.nombre(s.idTutor) }}</strong></div>
+        <div><span class="muted">Fecha</span><strong>{{ s.fechaInicio | date:"EEEE d 'de' MMMM" }}</strong></div>
+        <div><span class="muted">Horario</span><strong>{{ s.fechaInicio | date:'HH:mm' }} – {{ s.fechaFin | date:'HH:mm' }} ({{ d.horas(s) }} h)</strong></div>
+        <div><span class="muted">Tarifa</span><strong>{{ d.tutor(s.idTutor)?.tarifaPorHora | currency:'PEN':'S/ ' }} /h</strong></div>
+        <hr class="sep">
+        <div class="total"><span>Total</span><strong>{{ monto | currency:'PEN':'S/ ' }}</strong></div>
+      </div>
+      <p class="small muted" style="margin-top:12px"><span class="material-icons" style="font-size:16px">lock</span> Pago seguro. El tutor recibe el dinero cuando se realiza la sesión.</p>
+    </div>
+
+    <div class="card">
+      @if (exito || pagado || s.estado === 'agendada') {
+        <div class="ok-box">
+          <span class="material-icons">check_circle</span>
+          <h3>Sesión confirmada</h3>
+          <p class="muted">Te enviamos la confirmación por correo. El día de la clase entra a la videollamada desde “Mis sesiones”.</p>
+          <div class="acciones" style="justify-content:center;margin-top:16px">
+            <a class="btn" routerLink="/estudiante/sesiones">Ir a mis sesiones</a>
+            <a class="btn sec" [routerLink]="['/sala', s.idSesion]"><span class="material-icons">videocam</span>Probar videollamada</a>
+          </div>
+        </div>
+      } @else if (s.estado === 'cancelada') {
+        <div class="aviso warn">Esta sesión fue cancelada.</div>
+      } @else {
+        <h3 style="margin-bottom:14px">Método de pago</h3>
+        <div class="metodos">
+          @if (culqi.habilitado) {
+            <button type="button" [class.on]="metodo === 'culqi'" (click)="metodo = 'culqi'"><span class="material-icons">credit_card</span>Culqi</button>
+          }
+          <button type="button" [class.on]="metodo === 'tarjeta'" (click)="metodo = 'tarjeta'"><span class="material-icons">credit_card</span>Tarjeta</button>
+          <button type="button" [class.on]="metodo === 'yape'" (click)="metodo = 'yape'"><span class="material-icons">smartphone</span>Yape</button>
+        </div>
+
+        <div class="form" style="margin-top:16px">
+          @if (metodo === 'culqi') {
+            <div class="aviso">Se abrirá el checkout de Culqi (sandbox). Tarjeta de prueba: 4111 1111 1111 1111, CVV 123.</div>
+          } @else if (metodo === 'tarjeta') {
+            <label class="campo">Número de tarjeta<input [(ngModel)]="tarjeta.numero" inputmode="numeric" maxlength="19"></label>
+            <label class="campo">Titular<input [(ngModel)]="tarjeta.nombre"></label>
+            <div class="fila">
+              <label class="campo">Vencimiento<input [(ngModel)]="tarjeta.venc" placeholder="MM/AA" maxlength="5"></label>
+              <label class="campo">CVV<input [(ngModel)]="tarjeta.cvv" maxlength="4" inputmode="numeric"></label>
+            </div>
+            <span class="small muted">Modo sandbox: usa 4111 1111 1111 1111 (aprobada) o 4000 0000 0000 0002 (rechazada).</span>
+          } @else {
+            <label class="campo">Celular Yape<input [(ngModel)]="yape.celular" maxlength="9" inputmode="numeric" placeholder="9XXXXXXXX"></label>
+            <label class="campo">Código de aprobación<input [(ngModel)]="yape.codigo" maxlength="6" inputmode="numeric" placeholder="6 dígitos"></label>
+          }
+          @if (error) { <div class="aviso error">{{ error }}</div> }
+          <button class="btn block acento" (click)="pagar()" [disabled]="procesando">
+            {{ procesando ? 'Procesando pago...' : 'Pagar ' + (monto | currency:'PEN':'S/ ') }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}

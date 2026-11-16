@@ -1,0 +1,42 @@
+<div class="page-head">
+  <div><h2>Calificaciones</h2><p>Valoraciones de los estudiantes a sus tutores</p></div>
+  <a class="btn" routerLink="/admin/calificaciones/nuevo"><span class="material-icons">add</span>Registrar calificación</a>
+</div>
+<div class="filtros">
+  <label class="campo">Tutor
+    <select [(ngModel)]="idTutor" (ngModelChange)="filtrar()">
+      <option [ngValue]="null">Todos</option>
+      @for (t of d.tutores; track t.idTutor) { <option [ngValue]="t.idTutor">{{ d.nombre(t.idUsuario) }}</option> }
+    </select>
+  </label>
+  <label class="campo corto">Mínimo
+    <select [(ngModel)]="minimo" (ngModelChange)="filtrar()">
+      <option [ngValue]="0">Todas</option>
+      @for (n of [5,4,3,2,1]; track n) { <option [ngValue]="n">{{ n }}+ ★</option> }
+    </select>
+  </label>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>#</th><th>Fecha</th><th>Tutor</th><th>Sesión</th><th>Puntuación</th><th>Comentario</th><th></th></tr></thead>
+    <tbody>
+      @for (c of lista; track c.idCalificacion) {
+        @let s = d.sesion(c.idSesion);
+        <tr>
+          <td>{{ c.idCalificacion }}</td>
+          <td>{{ c.fechaCalificacion | date:'dd/MM/yy' }}</td>
+          <td>{{ c.nombreTutor || d.nombre(c.idTutor) }}</td>
+          <td>#{{ c.idSesion }} <span class="small muted">{{ d.nombreMateria(s?.idMateria) }} · {{ d.nombre(s?.idEstudiante) }}</span></td>
+          <td><span class="estrellas">{{ (c.puntuacion | estrellas).on }}<span class="off">{{ (c.puntuacion | estrellas).off }}</span></span></td>
+          <td class="small">{{ c.comentario }}</td>
+          <td class="acc">
+            <a class="icon-btn" [routerLink]="['/admin/calificaciones/editar', c.idCalificacion]" title="Editar"><span class="material-icons">edit</span></a>
+            <button class="icon-btn rojo" (click)="eliminar(c)" title="Eliminar"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="7"><div class="vacio"><span class="material-icons">star</span>{{ cargando ? 'Cargando...' : 'No hay calificaciones' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>

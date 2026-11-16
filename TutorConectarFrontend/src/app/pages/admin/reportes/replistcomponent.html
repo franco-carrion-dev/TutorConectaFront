@@ -1,0 +1,47 @@
+<div class="page-head">
+  <div><h2>Reportes de progreso</h2><p>Notas y observaciones registradas por sesión</p></div>
+  <a class="btn" [routerLink]="base + '/nuevo'"><span class="material-icons">add</span>Registrar reporte</a>
+</div>
+@if (!esTutor) {
+  <div class="filtros">
+    <label class="campo">Tutor
+      <select [(ngModel)]="idTutor" (ngModelChange)="buscar()">
+        <option [ngValue]="null">Todos</option>
+        @for (t of d.tutores; track t.idTutor) { <option [ngValue]="t.idTutor">{{ d.nombre(t.idUsuario) }}</option> }
+      </select>
+    </label>
+    <label class="campo">Estudiante
+      <select [(ngModel)]="idEstudiante" (ngModelChange)="buscar()">
+        <option [ngValue]="null">Todos</option>
+        @for (e of d.estudiantes; track e.idEstudiante) { <option [ngValue]="e.idEstudiante">{{ d.nombre(e.idUsuario) }}</option> }
+      </select>
+    </label>
+  </div>
+}
+<div class="tabla">
+  <table>
+    <thead><tr><th>Fecha</th><th>Sesión</th><th>Estudiante</th>@if (!esTutor) {<th>Tutor</th>}<th>Progreso</th><th>Observaciones</th><th></th></tr></thead>
+    <tbody>
+      @for (r of lista; track r.idReporte) {
+        @let s = d.sesion(r.idSesion);
+        <tr>
+          <td>{{ r.fechaReporte | date:'dd/MM/yy' }}</td>
+          <td>#{{ r.idSesion }} · {{ d.nombreMateria(s?.idMateria) }}</td>
+          <td>{{ d.nombre(s?.idEstudiante) }}</td>
+          @if (!esTutor) { <td>{{ r.nombreTutor || d.nombre(r.idTutor) }}</td> }
+          <td style="min-width:150px">
+            <div class="small">{{ r.progreso }}</div>
+            @if (pct[r.progreso]) { <div class="barra-fila" style="grid-template-columns:1fr"><div class="pista"><div class="relleno verde" [style.width.%]="pct[r.progreso]"></div></div></div> }
+          </td>
+          <td class="small">{{ r.observaciones }}</td>
+          <td class="acc">
+            <a class="icon-btn" [routerLink]="[base + '/editar', r.idReporte]" title="Editar"><span class="material-icons">edit</span></a>
+            <button class="icon-btn rojo" (click)="eliminar(r)" title="Eliminar"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td [attr.colspan]="esTutor ? 6 : 7"><div class="vacio"><span class="material-icons">trending_up</span>{{ cargando ? 'Cargando...' : 'No hay reportes' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>
