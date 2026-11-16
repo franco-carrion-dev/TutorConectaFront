@@ -1,0 +1,21 @@
+<div class="page-head">
+  <div>
+    <h2>Videollamada</h2>
+    @if (s) { <p>{{ d.nombreMateria(s.idMateria) }} · {{ d.nombre(s.idTutor) }} con {{ d.nombre(s.idEstudiante) }} · {{ s.fechaInicio | date:'dd/MM HH:mm' }}–{{ s.fechaFin | date:'HH:mm' }}</p> }
+  </div>
+  <div class="acciones">
+    @if (s?.enlaceJitsi && permitido) { <a class="btn sec" [href]="s!.enlaceJitsi" target="_blank" rel="noopener"><span class="material-icons">open_in_new</span>Abrir en otra pestaña</a> }
+    <a class="btn sec" [routerLink]="volver"><span class="material-icons">arrow_back</span>Volver</a>
+  </div>
+</div>
+@if (cargando) { <div class="vacio">Preparando la sala...</div> }
+@else if (!s || !permitido) { <div class="card vacio"><span class="material-icons">lock</span>No tienes acceso a esta sesión.</div> }
+@else if (!s.enlaceJitsi) { <div class="card vacio"><span class="material-icons">videocam_off</span>Esta sesión no tiene enlace de videollamada.</div> }
+@else {
+  @if (s.estado !== 'agendada') { <div class="aviso warn" style="margin-bottom:12px">Estado de la sesión: {{ s.estado | etiqueta }}</div> }
+  <div class="card" style="padding:0;overflow:hidden">
+    <iframe [src]="url" allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
+      style="width:100%;height:72vh;border:0;display:block" title="Videollamada Jitsi Meet"></iframe>
+  </div>
+  <p class="small muted" style="margin-top:8px">Videollamada con Jitsi Meet (meet.jit.si). Si el video no carga o se corta, usa “Abrir en otra pestaña”.</p>
+}

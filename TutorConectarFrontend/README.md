@@ -1,59 +1,29 @@
-# TutorConectarFrontend
+# TutorConecta – Frontend (Angular 21)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.24.
+## Ejecutar
+1. Levanta el backend (puerto 8080) con las variables de siempre (BD, `JWT_SECRET`, `JWT_EXPIRATION_MS`).
+2. `npm install`
+3. `ng serve` → http://localhost:4200
+4. Entra con **admin@tutorconecta.com / admin123** (lo crea el backend al iniciar), o regístrate como estudiante o tutor.
 
-## Development server
+La URL del backend está en `src/environments/environment*.ts` (`base`).
 
-To start a local development server, run:
+## Roles
+- **Admin**: dashboard de reportes, CRUD de usuarios, roles, tutores (verificación de identidad), estudiantes,
+  materias, disponibilidad, sesiones, pagos (resolver disputas), calificaciones y reportes de progreso.
+- **Tutor**: panel (ingresos, rating), sesiones (unirse, marcar realizada), disponibilidad semanal,
+  reportes de progreso y perfil (materias, tarifa, biografía).
+- **Estudiante**: panel (historial y progreso por materia), búsqueda con filtros y recomendación IA,
+  agenda con validación automática de disponibilidad, pago, videollamada, calificación y disputas.
 
-```bash
-ng serve
-```
+## APIs
+- **API REST propia (Spring Boot)** con JWT (interceptor) y guards por rol.
+- **Jitsi Meet**: videollamada embebida (`/sala/:id`). meet.jit.si limita las llamadas embebidas a unos minutos;
+  para clases largas usa “Abrir en otra pestaña”.
+- **Culqi (sandbox)**: pon tu llave `pk_test_...` en `culqiPublicKey` del environment. Si la dejas vacía,
+  se usa un pago de prueba interno (tarjeta 4111 1111 1111 1111 = aprobada, 4000… = rechazada, o Yape).
+- **JavaMail**: lo envía el backend (ver `CAMBIOS_BACKEND.md`).
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Flujo de una sesión
+`pendiente_pago` → (pago) → `agendada` → `realizada` | `cancelada`.
+Si se cancela una sesión pagada, el pago pasa a `EN_DISPUTA` y el admin decide si se reembolsa.

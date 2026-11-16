@@ -1,0 +1,89 @@
+@if (cargando) { <div class="vacio">Cargando perfil...</div> }
+@else if (!t || !t.verificado) {
+  <div class="card vacio"><span class="material-icons">person_off</span>Este tutor no está disponible.
+    <div style="margin-top:12px"><a class="btn sec" routerLink="/estudiante/buscar">Volver a la búsqueda</a></div></div>
+} @else {
+  <div class="page-head">
+    <a class="btn sec sm" routerLink="/estudiante/buscar"><span class="material-icons">arrow_back</span>Buscar tutores</a>
+  </div>
+  <div class="grid-2" style="align-items:start">
+    <div class="stack">
+      <div class="card">
+        <div style="display:flex;gap:16px;align-items:center">
+          <span class="avatar lg">{{ nombre | iniciales }}</span>
+          <div>
+            <h2 style="display:flex;align-items:center;gap:6px">{{ nombre }}<span class="material-icons" style="color:var(--primary-600)" title="Identidad verificada">verified</span></h2>
+            @if (rating.n) {
+              <span class="estrellas">{{ (rating.prom | estrellas).on }}<span class="off">{{ (rating.prom | estrellas).off }}</span></span>
+              <span class="muted"> {{ rating.prom | number:'1.1-1' }} · {{ rating.n }} reseñas · {{ realizadas }} sesiones</span>
+            } @else { <span class="muted">Tutor nuevo</span> }
+          </div>
+        </div>
+        <hr class="sep">
+        <div class="small muted" style="margin-bottom:4px">Materias</div>
+        <div>@for (id of t.idMaterias; track id) { <span class="tag">{{ d.nombreMateria(id) }} · {{ d.materia(id)?.nivelEducativo }}</span> }</div>
+        @if (t.biografia) { <p style="margin-top:14px;white-space:pre-line">{{ t.biografia }}</p> }
+        <p style="margin-top:14px"><strong style="font-size:22px">{{ t.tarifaPorHora | currency:'PEN':'S/ ' }}</strong><span class="muted"> por hora</span></p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:10px">Disponibilidad semanal</h3>
+        @for (dia of dias; track dia) {
+          @if (bloques(dia).length) {
+            <div class="item"><strong style="width:90px">{{ dia }}</strong>
+              <div>@for (b of bloques(dia); track b.idDisponibilidad) { <span class="tag">{{ hhmm(b.horaInicio) }}–{{ hhmm(b.horaFin) }}</span> }</div></div>
+          }
+        }
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:10px">Reseñas</h3>
+        @for (c of resenas; track c.idCalificacion) {
+          <div class="item" style="align-items:flex-start">
+            <div class="txt">
+              <span><span class="estrellas">{{ (c.puntuacion | estrellas).on }}<span class="off">{{ (c.puntuacion | estrellas).off }}</span></span>
+                <span class="small muted"> · {{ d.nombre(d.sesion(c.idSesion)?.idEstudiante) }} · {{ c.fechaCalificacion | date:'dd/MM/yy' }}</span></span>
+              @if (c.comentario) { <span class="small">{{ c.comentario }}</span> }
+            </div>
+          </div>
+        } @empty { <p class="small muted">Aún no tiene reseñas.</p> }
+      </div>
+    </div>
+
+    <div class="card" style="position:sticky;top:76px">
+      <h3>Agendar sesión</h3>
+      <p class="small muted" style="margin:4px 0 16px">Solo verás horarios dentro de la disponibilidad del tutor y sin cruces.</p>
+      <div class="form">
+        <label class="campo">Materia *
+          <select [(ngModel)]="idMateria">
+            <option [ngValue]="null" disabled>Selecciona</option>
+            @for (id of t.idMaterias; track id) { <option [ngValue]="id">{{ d.nombreMateria(id) }}</option> }
+          </select>
+        </label>
+        <div class="fila">
+          <label class="campo">Fecha *<input type="date" [min]="hoy" [(ngModel)]="fecha" (ngModelChange)="calcularSlots()"></label>
+          <label class="campo">Duración
+            <select [(ngModel)]="duracion" (ngModelChange)="calcularSlots()">
+              <option [ngValue]="60">1 hora</option><option [ngValue]="90">1 h 30 min</option><option [ngValue]="120">2 horas</option>
+            </select>
+          </label>
+        </div>
+        @if (fecha) {
+          <div class="campo">Hora de inicio *
+            <div class="chips-select">
+              @for (s of slots; track s) { <label [class.on]="hora === s"><input type="radio" name="slot" [value]="s" [(ngModel)]="hora"> {{ s }}</label> }
+              @empty { <span class="ayuda">No hay horarios libres ese día. Prueba otra fecha.</span> }
+            </div>
+          </div>
+        }
+        <div class="aviso">
+          Total: <strong>{{ costo | currency:'PEN':'S/ ' }}</strong> · La sesión se confirma al completar el pago.
+        </div>
+        @if (error) { <div class="aviso error">{{ error }}</div> }
+        <button class="btn block" (click)="agendar()" [disabled]="guardando || !hora">
+          <span class="material-icons">event_available</span>{{ guardando ? 'Verificando disponibilidad...' : 'Agendar y pagar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
