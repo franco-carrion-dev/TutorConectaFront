@@ -1,0 +1,18 @@
+<div class="page-head">
+  <div><h2>{{ id ? 'Editar materia' : 'Registrar materia' }}</h2></div>
+  <a class="btn sec" routerLink="/admin/materias"><span class="material-icons">arrow_back</span>Volver</a>
+</div>
+<div class="card">
+  <form class="form" (ngSubmit)="aceptar()">
+    <label class="campo">Nombre *<input name="nombre" maxlength="100" [(ngModel)]="m.nombre" required></label>
+    <label class="campo">Nivel educativo *
+      <select name="nivel" [(ngModel)]="m.nivelEducativo" required>
+        <option value="" disabled>Selecciona</option>
+        @for (n of niveles; track n) { <option [value]="n">{{ n }}</option> }
+      </select>
+    </label>
+    <label class="campo">Descripción<textarea name="desc" [(ngModel)]="m.descripcion"></textarea></label>
+    @if (error) { <div class="aviso error">{{ error }}</div> }
+    <div class="acciones"><button class="btn" type="submit">Guardar</button><a class="btn sec" routerLink="/admin/materias">Cancelar</a></div>
+  </form>
+</div>

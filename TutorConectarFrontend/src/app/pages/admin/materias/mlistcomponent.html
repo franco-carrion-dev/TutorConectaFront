@@ -1,0 +1,32 @@
+<div class="page-head">
+  <div><h2>Materias</h2><p>Catálogo de cursos y niveles educativos</p></div>
+  <a class="btn" routerLink="/admin/materias/nuevo"><span class="material-icons">add</span>Registrar materia</a>
+</div>
+<div class="filtros">
+  <label class="campo">Nombre<input placeholder="Buscar materia" [(ngModel)]="texto" (ngModelChange)="filtrar()"></label>
+  <label class="campo corto">Nivel
+    <select [(ngModel)]="nivel" (ngModelChange)="filtrar()">
+      <option value="">Todos</option>
+      @for (n of niveles; track n) { <option [value]="n">{{ n }}</option> }
+    </select>
+  </label>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>ID</th><th>Nombre</th><th>Descripción</th><th>Nivel</th><th></th></tr></thead>
+    <tbody>
+      @for (m of lista; track m.idMateria) {
+        <tr>
+          <td>{{ m.idMateria }}</td><td><strong>{{ m.nombre }}</strong></td><td>{{ m.descripcion }}</td>
+          <td><span class="tag">{{ m.nivelEducativo }}</span></td>
+          <td class="acc">
+            <a class="icon-btn" [routerLink]="['/admin/materias/editar', m.idMateria]" title="Editar"><span class="material-icons">edit</span></a>
+            <button class="icon-btn rojo" (click)="eliminar(m)" title="Eliminar"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="5"><div class="vacio"><span class="material-icons">menu_book</span>{{ cargando ? 'Cargando...' : 'No hay materias' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>
