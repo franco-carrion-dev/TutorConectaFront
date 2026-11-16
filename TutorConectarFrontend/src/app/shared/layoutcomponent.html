@@ -1,0 +1,39 @@
+<div class="shell" [class.abierto]="abierto()">
+  <aside class="side">
+    <a class="marca" routerLink="/">
+      <span class="logo"><span class="material-icons">school</span></span>
+      <span>Tutor<b>Conecta</b></span>
+    </a>
+    <nav>
+      @for (i of items(); track i.ruta) {
+        <a [routerLink]="i.ruta" routerLinkActive="activo" (click)="abierto.set(false)">
+          <span class="material-icons">{{ i.icono }}</span>{{ i.texto }}
+        </a>
+      }
+    </nav>
+    <div class="ods small">ODS 4 · Educación de calidad</div>
+  </aside>
+  <div class="velo" (click)="abierto.set(false)"></div>
+
+  <div class="main">
+    <header class="top">
+      <button class="icon-btn menu" (click)="abierto.set(!abierto())" aria-label="Menú">
+        <span class="material-icons">menu</span>
+      </button>
+      <div class="espacio"></div>
+      <div class="user">
+        <span class="avatar">{{ auth.usuario()?.nombre | iniciales }}</span>
+        <div class="info">
+          <strong>{{ auth.usuario()?.nombre }}</strong>
+          <span class="small muted">{{ rolTexto() }}</span>
+        </div>
+        <button class="icon-btn" (click)="salir()" title="Cerrar sesión" aria-label="Cerrar sesión">
+          <span class="material-icons">logout</span>
+        </button>
+      </div>
+    </header>
+    <main class="contenido">
+      <router-outlet />
+    </main>
+  </div>
+</div>
