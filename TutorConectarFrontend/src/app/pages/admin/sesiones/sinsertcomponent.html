@@ -1,0 +1,43 @@
+<div class="page-head">
+  <div><h2>{{ id ? 'Editar sesión #' + id : 'Registrar sesión' }}</h2></div>
+  <a class="btn sec" routerLink="/admin/sesiones"><span class="material-icons">arrow_back</span>Volver</a>
+</div>
+<div class="card">
+  <form class="form ancho" (ngSubmit)="aceptar()">
+    <div class="fila">
+      <label class="campo">Estudiante *
+        <select name="est" [(ngModel)]="s.idEstudiante" required>
+          <option [ngValue]="0" disabled>Selecciona</option>
+          @for (e of d.estudiantes; track e.idEstudiante) { <option [ngValue]="e.idEstudiante">{{ d.nombre(e.idUsuario) }}</option> }
+        </select>
+      </label>
+      <label class="campo">Tutor *
+        <select name="tut" [(ngModel)]="s.idTutor" required>
+          <option [ngValue]="0" disabled>Selecciona</option>
+          @for (t of d.tutores; track t.idTutor) { <option [ngValue]="t.idTutor">{{ d.nombre(t.idUsuario) }}</option> }
+        </select>
+      </label>
+      <label class="campo">Materia *
+        <select name="mat" [(ngModel)]="s.idMateria" required>
+          <option [ngValue]="0" disabled>Selecciona</option>
+          @for (m of materiasDelTutor(); track m.idMateria) { <option [ngValue]="m.idMateria">{{ m.nombre }}</option> }
+        </select>
+      </label>
+    </div>
+    <div class="fila">
+      <label class="campo">Inicio *<input type="datetime-local" name="ini" [(ngModel)]="s.fechaInicio" required></label>
+      <label class="campo">Fin *<input type="datetime-local" name="fin" [(ngModel)]="s.fechaFin" required></label>
+      <label class="campo">Estado *
+        <select name="estado" [(ngModel)]="s.estado">
+          @for (e of estados; track e) { <option [value]="e">{{ e | etiqueta }}</option> }
+        </select>
+      </label>
+    </div>
+    <label class="campo">Enlace de videollamada (Jitsi Meet)
+      <div style="display:flex;gap:8px"><input name="jitsi" [(ngModel)]="s.enlaceJitsi" maxlength="255">
+        <button type="button" class="btn sec" (click)="generarEnlace()">Generar</button></div>
+    </label>
+    @if (error) { <div class="aviso error">{{ error }}</div> }
+    <div class="acciones"><button class="btn" type="submit">Guardar</button><a class="btn sec" routerLink="/admin/sesiones">Cancelar</a></div>
+  </form>
+</div>

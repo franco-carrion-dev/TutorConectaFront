@@ -1,0 +1,27 @@
+<div class="page-head">
+  <div><h2>{{ id ? 'Editar reporte de progreso' : 'Registrar reporte de progreso' }}</h2><p>Notas u observaciones de la sesión</p></div>
+  <a class="btn sec" [routerLink]="base"><span class="material-icons">arrow_back</span>Volver</a>
+</div>
+<div class="card">
+  <form class="form" (ngSubmit)="aceptar()">
+    <label class="campo">Sesión realizada *
+      <select name="ses" [(ngModel)]="r.idSesion" (ngModelChange)="alElegir()" required>
+        <option [ngValue]="0" disabled>Selecciona</option>
+        @for (s of sesiones(); track s.idSesion) {
+          <option [ngValue]="s.idSesion">#{{ s.idSesion }} · {{ d.nombreMateria(s.idMateria) }} · {{ d.nombre(s.idEstudiante) }} · {{ s.fechaInicio | date:'dd/MM/yy' }}</option>
+        }
+      </select>
+      @if (!sesiones().length) { <span class="ayuda">Solo se reportan sesiones marcadas como realizadas</span> }
+    </label>
+    <div class="campo">Nivel de progreso *
+      <div class="chips-select">
+        @for (n of niveles; track n) {
+          <label [class.on]="r.progreso === n"><input type="radio" name="prog" [value]="n" [(ngModel)]="r.progreso"> {{ n }}</label>
+        }
+      </div>
+    </div>
+    <label class="campo">Observaciones<textarea name="obs" rows="5" [(ngModel)]="r.observaciones" placeholder="Temas vistos, dificultades, tareas recomendadas..."></textarea></label>
+    @if (error) { <div class="aviso error">{{ error }}</div> }
+    <div class="acciones"><button class="btn" type="submit">Guardar</button><a class="btn sec" [routerLink]="base">Cancelar</a></div>
+  </form>
+</div>

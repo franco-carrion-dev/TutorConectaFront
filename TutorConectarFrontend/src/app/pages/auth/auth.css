@@ -1,0 +1,18 @@
+.pantalla { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; }
+.hero { background: linear-gradient(150deg, var(--primary-800), var(--primary-600)); color: #fff; padding: 48px; display: flex; flex-direction: column; justify-content: space-between; }
+.hero .marca { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; }
+.hero .marca .logo { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,.18); display: inline-flex; align-items: center; justify-content: center; }
+.hero h1 { font-size: 38px; line-height: 46px; max-width: 460px; }
+.hero ul { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 12px; max-width: 440px; }
+.hero li { display: flex; gap: 10px; align-items: flex-start; color: #DBEAFE; }
+.hero li .material-icons { color: var(--accent-500); }
+.panel { display: flex; align-items: center; justify-content: center; padding: 32px 20px; }
+.caja { width: 100%; max-width: 420px; }
+.caja h2 { margin-bottom: 4px; }
+.caja > p { color: var(--gray-500); margin-bottom: 24px; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tabs button { height: 64px; border: 1px solid var(--gray-300); border-radius: var(--r-md); background: #fff; cursor: pointer; font: 600 14px var(--font); color: var(--gray-700); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.tabs button.on { border-color: var(--primary-700); background: var(--primary-50); color: var(--primary-800); box-shadow: 0 0 0 1px var(--primary-700); }
+.pie { margin-top: 18px; text-align: center; font-size: 14px; color: var(--gray-500); }
+.demo { margin-top: 16px; font-size: 12px; }
+@media (max-width: 900px) { .pantalla { grid-template-columns: 1fr; } .hero { display: none; } }

@@ -1,0 +1,40 @@
+<div class="page-head">
+  <div><h2>{{ edicion ? 'Editar usuario' : 'Registrar usuario' }}</h2><p>Roles: administrador, tutor o estudiante</p></div>
+  <a class="btn sec" routerLink="/admin/usuarios"><span class="material-icons">arrow_back</span>Volver</a>
+</div>
+<div class="card">
+  <form class="form" (ngSubmit)="aceptar()">
+    <div class="fila">
+      <label class="campo">Nombre *<input name="nombre" [(ngModel)]="u.nombre" required></label>
+      <label class="campo">Apellido *<input name="apellido" [(ngModel)]="u.apellido" required></label>
+    </div>
+    <label class="campo">Email *<input type="email" name="email" [(ngModel)]="u.email" required></label>
+    <div class="fila">
+      <label class="campo">Contraseña {{ edicion ? '' : '*' }}
+        <input type="password" name="pass" [(ngModel)]="u.passwordHash" autocomplete="new-password">
+        @if (edicion) { <span class="ayuda">Déjala vacía para mantener la actual</span> }
+      </label>
+      <label class="campo">Rol *
+        <select name="rol" [(ngModel)]="u.idRol" required>
+          <option [ngValue]="null" disabled>Selecciona</option>
+          @for (r of roles; track r.idRol) { <option [ngValue]="r.idRol">{{ r.denominacion }}</option> }
+        </select>
+      </label>
+    </div>
+    @if (!edicion && rolNombre() === 'TUTOR') {
+      <div class="fila">
+        <label class="campo">Tarifa por hora (S/) *<input type="number" min="1" name="tarifa" [(ngModel)]="tarifa"></label>
+      </div>
+      <label class="campo">Biografía<textarea name="bio" [(ngModel)]="biografia"></textarea></label>
+    }
+    @if (!edicion && rolNombre() === 'ESTUDIANTE') {
+      <label class="campo">Presupuesto máximo por hora (S/)<input type="number" min="0" name="pres" [(ngModel)]="presupuesto"></label>
+    }
+    <label class="check"><input type="checkbox" name="activo" [(ngModel)]="u.activo"> Usuario activo</label>
+    @if (error) { <div class="aviso error">{{ error }}</div> }
+    <div class="acciones">
+      <button class="btn" type="submit" [disabled]="guardando">{{ guardando ? 'Guardando...' : 'Guardar' }}</button>
+      <a class="btn sec" routerLink="/admin/usuarios">Cancelar</a>
+    </div>
+  </form>
+</div>

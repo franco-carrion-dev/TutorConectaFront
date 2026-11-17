@@ -1,0 +1,42 @@
+<div class="page-head">
+  <div><h2>Usuarios</h2><p>Administradores, tutores y estudiantes registrados</p></div>
+  <a class="btn" routerLink="/admin/usuarios/nuevo"><span class="material-icons">person_add</span>Registrar usuario</a>
+</div>
+
+<div class="filtros">
+  <label class="campo">Buscar<input placeholder="Nombre, apellido o email" [(ngModel)]="texto" (ngModelChange)="filtrar()"></label>
+  <label class="campo corto">Rol
+    <select [(ngModel)]="idRol" (ngModelChange)="filtrar()">
+      <option [ngValue]="null">Todos</option>
+      @for (r of d.roles; track r.idRol) { <option [ngValue]="r.idRol">{{ r.denominacion }}</option> }
+    </select>
+  </label>
+  <button class="btn sec" (click)="buscarTutores()"><span class="material-icons">search</span>Buscar tutores por nombre</button>
+  <button class="btn sec" (click)="texto=''; idRol=null; filtrar()">Limpiar</button>
+</div>
+
+<div class="tabla">
+  <table>
+    <thead><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Registro</th><th></th></tr></thead>
+    <tbody>
+      @for (u of lista; track u.idUsuario) {
+        <tr>
+          <td>{{ u.idUsuario }}</td>
+          <td>{{ u.nombre }} {{ u.apellido }}</td>
+          <td>{{ u.email }}</td>
+          <td><span class="chip info">{{ d.nombreRol(u.idRol) }}</span></td>
+          <td><span class="chip" [class.ok]="u.activo" [class.error]="!u.activo">{{ u.activo ? 'Activo' : 'Inactivo' }}</span></td>
+          <td>{{ u.fechaRegistro | date:'dd/MM/yyyy' }}</td>
+          <td class="acc">
+            <button class="icon-btn" (click)="cambiarActivo(u)" [title]="u.activo ? 'Desactivar' : 'Activar'">
+              <span class="material-icons">{{ u.activo ? 'toggle_on' : 'toggle_off' }}</span></button>
+            <a class="icon-btn" [routerLink]="['/admin/usuarios/editar', u.idUsuario]" title="Editar"><span class="material-icons">edit</span></a>
+            <button class="icon-btn rojo" (click)="eliminar(u)" title="Eliminar"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="7"><div class="vacio"><span class="material-icons">group</span>{{ cargando ? 'Cargando...' : 'No hay usuarios' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,31 @@
+.shell { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+.side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; background: #fff; border-right: 1px solid var(--gray-200); padding: 16px 12px; overflow-y: auto; }
+.marca { display: flex; align-items: center; gap: 10px; padding: 4px 8px 18px; font-size: 19px; font-weight: 700; color: var(--gray-900); text-decoration: none !important; }
+.marca b { color: var(--primary-700); }
+.logo { width: 34px; height: 34px; border-radius: 10px; background: var(--primary-700); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+nav { display: grid; gap: 2px; }
+nav a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r-md); color: var(--gray-700); font-size: 14px; font-weight: 500; text-decoration: none !important; }
+nav a:hover { background: var(--gray-100); }
+nav a.activo { background: var(--primary-50); color: var(--primary-800); font-weight: 600; }
+nav a.activo .material-icons { color: var(--primary-700); }
+nav .material-icons { color: var(--gray-500); }
+.ods { margin-top: auto; padding: 12px 8px 0; color: var(--gray-500); }
+.main { min-width: 0; display: flex; flex-direction: column; }
+.top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 24px; background: rgba(255,255,255,.92); backdrop-filter: blur(6px); border-bottom: 1px solid var(--gray-200); }
+.espacio { flex: 1; }
+.user { display: flex; align-items: center; gap: 10px; }
+.user .info { display: flex; flex-direction: column; line-height: 18px; font-size: 14px; }
+.user .avatar { width: 34px; height: 34px; font-size: 13px; }
+.menu { display: none; }
+.contenido { padding: 24px; max-width: 1280px; width: 100%; }
+.velo { display: none; }
+@media (max-width: 900px) {
+  .shell { grid-template-columns: 1fr; }
+  .side { position: fixed; left: 0; top: 0; z-index: 40; width: 260px; transform: translateX(-100%); transition: transform .2s; }
+  .abierto .side { transform: none; }
+  .abierto .velo { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 30; }
+  .menu { display: inline-flex; }
+  .top { padding: 0 12px; }
+  .user .info { display: none; }
+  .contenido { padding: 16px; }
+}

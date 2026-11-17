@@ -1,0 +1,22 @@
+<div class="page-head">
+  <div><h2>Roles</h2><p>Los roles base son ADMIN, TUTOR y ESTUDIANTE</p></div>
+  <a class="btn" routerLink="/admin/roles/nuevo"><span class="material-icons">add</span>Registrar rol</a>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>ID</th><th>Denominación</th><th>Descripción</th><th></th></tr></thead>
+    <tbody>
+      @for (r of lista; track r.idRol) {
+        <tr>
+          <td>{{ r.idRol }}</td><td><strong>{{ r.denominacion }}</strong></td><td>{{ r.descripcion }}</td>
+          <td class="acc">
+            <a class="icon-btn" [routerLink]="['/admin/roles/editar', r.idRol]" title="Editar"><span class="material-icons">edit</span></a>
+            <button class="icon-btn rojo" (click)="eliminar(r)" title="Eliminar"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="4"><div class="vacio">{{ cargando ? 'Cargando...' : 'No hay roles' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>

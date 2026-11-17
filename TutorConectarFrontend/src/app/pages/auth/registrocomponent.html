@@ -1,0 +1,51 @@
+<div class="pantalla">
+  <section class="hero">
+    <div class="marca"><span class="logo"><span class="material-icons">school</span></span>TutorConecta</div>
+    <div>
+      <h1>Únete como estudiante o como tutor.</h1>
+      <ul>
+        <li><span class="material-icons">auto_awesome</span>Recomendaciones de tutores según tu materia, horario y presupuesto</li>
+        <li><span class="material-icons">trending_up</span>Seguimiento de tu progreso por materia</li>
+        <li><span class="material-icons">payments</span>Tutores: genera ingresos enseñando lo que dominas</li>
+      </ul>
+    </div>
+    <span class="small">ODS 4 · Educación de calidad — meta 4.1</span>
+  </section>
+
+  <section class="panel">
+    <div class="caja">
+      <h2>Crear cuenta</h2>
+      <p>¿Cómo usarás TutorConecta?</p>
+      <form class="form" (ngSubmit)="registrar()">
+        <div class="tabs">
+          <button type="button" [class.on]="dto.rol === 'ESTUDIANTE'" (click)="dto.rol = 'ESTUDIANTE'">
+            <span class="material-icons">face</span>Soy estudiante
+          </button>
+          <button type="button" [class.on]="dto.rol === 'TUTOR'" (click)="dto.rol = 'TUTOR'">
+            <span class="material-icons">school</span>Soy tutor
+          </button>
+        </div>
+        <div class="fila">
+          <label class="campo">Nombre *<input name="nombre" [(ngModel)]="dto.nombre" required></label>
+          <label class="campo">Apellido *<input name="apellido" [(ngModel)]="dto.apellido" required></label>
+        </div>
+        <label class="campo">Email *<input type="email" name="email" [(ngModel)]="dto.email" required></label>
+        <div class="fila">
+          <label class="campo">Contraseña *<input type="password" name="password" [(ngModel)]="dto.password" required></label>
+          <label class="campo">Repetir *<input type="password" name="confirmar" [(ngModel)]="confirmar" required></label>
+        </div>
+        @if (dto.rol === 'TUTOR') {
+          <label class="campo">Tarifa por hora (S/) *<input type="number" min="1" name="tarifa" [(ngModel)]="dto.tarifaPorHora"></label>
+          <label class="campo">Biografía <span class="ayuda">Tu experiencia, estudios y cómo enseñas</span>
+            <textarea name="bio" [(ngModel)]="dto.biografia"></textarea></label>
+        } @else {
+          <label class="campo">Presupuesto máximo por hora (S/) <span class="ayuda">Lo usamos para recomendarte tutores</span>
+            <input type="number" min="0" name="presupuesto" [(ngModel)]="dto.presupuestoMaximo"></label>
+        }
+        @if (error) { <div class="aviso error">{{ error }}</div> }
+        <button class="btn block" type="submit" [disabled]="cargando">{{ cargando ? 'Creando cuenta...' : 'Crear cuenta' }}</button>
+      </form>
+      <p class="pie">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+    </div>
+  </section>
+</div>

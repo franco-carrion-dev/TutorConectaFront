@@ -1,0 +1,112 @@
+<div class="page-head">
+  <div><h2>Reportes y dashboard</h2><p>Uso de la plataforma, ingresos y calidad de las tutorías</p></div>
+  <div class="acciones">
+    <button class="btn sec sm" (click)="periodo(30)">30 días</button>
+    <button class="btn sec sm" (click)="periodo(90)">90 días</button>
+    <button class="btn sec sm" (click)="periodo(365)">1 año</button>
+    <button class="btn sec sm" (click)="periodo(null)">Todo</button>
+  </div>
+</div>
+
+<div class="filtros">
+  <label class="campo corto">Desde<input type="date" [(ngModel)]="desde" (ngModelChange)="calcular()"></label>
+  <label class="campo corto">Hasta<input type="date" [(ngModel)]="hasta" (ngModelChange)="calcular()"></label>
+  <span class="small muted">{{ cargando ? 'Cargando datos...' : 'Los reportes se recalculan con el periodo elegido' }}</span>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="lbl"><span class="material-icons">event</span>Sesiones</div><div class="val">{{ kpi.sesiones }}</div>
+    <div class="sub">{{ kpi.agendadas }} agendadas · {{ kpi.realizadas }} realizadas</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">event_busy</span>Canceladas</div><div class="val">{{ kpi.canceladas }}</div>
+    <div class="sub">{{ (kpi.sesiones ? kpi.canceladas / kpi.sesiones : 0) | percent:'1.0-1' }} del total</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">payments</span>Ingresos</div><div class="val">{{ kpi.ingresos | currency:'PEN':'S/ ':'1.0-0' }}</div>
+    <div class="sub">Pagos completados</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">verified</span>Tutores verificados</div><div class="val">{{ kpi.tutores }}</div>
+    <div class="sub"><a routerLink="/admin/tutores">{{ kpi.pendientes }} por verificar</a></div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">face</span>Estudiantes</div><div class="val">{{ kpi.estudiantes }}</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">gavel</span>Disputas de pago</div><div class="val" [style.color]="kpi.disputas ? 'var(--warn-700)' : ''">{{ kpi.disputas }}</div>
+    <div class="sub"><a routerLink="/admin/pagos">Revisar pagos</a></div></div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Sesiones por mes</h3></div>
+    <div class="leyenda">
+      <span><i style="background:var(--success-700)"></i>Agendadas</span><span><i style="background:var(--primary-600)"></i>Realizadas</span>
+      <span><i style="background:var(--error-700)"></i>Canceladas</span><span><i style="background:var(--accent-500)"></i>Pendiente de pago</span>
+    </div>
+    <div class="apiladas">
+      @for (m of meses; track m.mes) {
+        <div class="apilada">
+          <span>{{ nombreMes(m.mes) }}</span>
+          <div class="pista" [style.width.%]="(m.total / maxMes) * 100">
+            <span [style.flex]="m.agendada" style="background:var(--success-700)" [title]="m.agendada + ' agendadas'"></span>
+            <span [style.flex]="m.realizada" style="background:var(--primary-600)" [title]="m.realizada + ' realizadas'"></span>
+            <span [style.flex]="m.cancelada" style="background:var(--error-700)" [title]="m.cancelada + ' canceladas'"></span>
+            <span [style.flex]="m.pendiente_pago" style="background:var(--accent-500)" [title]="m.pendiente_pago + ' pendientes'"></span>
+          </div>
+          <strong>{{ m.total }}</strong>
+        </div>
+      } @empty { <div class="vacio small">Sin sesiones en el periodo</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Materias con mayor demanda</h3><span class="small muted">sesiones</span></div>
+    <div class="barras">
+      @for (b of demanda; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.nombre">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno acento" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor }}</span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Ingresos por tutor</h3><span class="small muted">S/</span></div>
+    <div class="barras">
+      @for (b of ingresosTutor; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.nombre">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor | number:'1.0-0' }}</span></div>
+      } @empty { <div class="vacio small">Sin pagos completados</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Ingresos por materia</h3><span class="small muted">S/</span></div>
+    <div class="barras">
+      @for (b of ingresosMateria; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.nombre">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno verde" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor | number:'1.0-0' }}</span></div>
+      } @empty { <div class="vacio small">Sin pagos completados</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Tasa de cancelación por tutor</h3></div>
+    <div class="barras">
+      @for (b of cancelacion; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.nombre">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno rojo" [style.width.%]="b.pct"></div></div>
+          <span class="v">{{ b.valor | percent:'1.0-0' }} <span class="muted small">({{ b.extra }})</span></span></div>
+      } @empty { <div class="vacio small">Sin sesiones</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Ranking de tutores mejor calificados</h3></div>
+    @if (ranking.length) {
+      <div class="tabla" style="box-shadow:none">
+        <table>
+          <thead><tr><th>#</th><th>Tutor</th><th>Calificación</th><th class="num">Reseñas</th></tr></thead>
+          <tbody>
+            @for (r of ranking; track r.nombre; let i = $index) {
+              <tr><td><strong>{{ i + 1 }}</strong></td><td>{{ r.nombre }}</td>
+                <td><span class="estrellas">{{ (r.prom | estrellas).on }}<span class="off">{{ (r.prom | estrellas).off }}</span></span> {{ r.prom | number:'1.1-1' }}</td>
+                <td class="num">{{ r.n }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else { <div class="vacio small">Aún no hay calificaciones</div> }
+  </div>
+</div>

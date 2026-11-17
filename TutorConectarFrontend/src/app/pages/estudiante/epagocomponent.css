@@ -1,0 +1,9 @@
+.resumen { display: grid; gap: 10px; margin-top: 12px; }
+.resumen > div { display: flex; justify-content: space-between; gap: 12px; }
+.total { font-size: 20px; }
+.metodos { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+.metodos button { height: 56px; border: 1px solid var(--gray-300); border-radius: var(--r-md); background: #fff; cursor: pointer; font: 600 14px var(--font); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--gray-700); }
+.metodos button.on { border-color: var(--primary-700); background: var(--primary-50); color: var(--primary-800); box-shadow: 0 0 0 1px var(--primary-700); }
+.ok-box { text-align: center; padding: 16px 8px; }
+.ok-box > .material-icons { font-size: 56px; color: var(--success-700); }
+.ok-box h3 { margin: 8px 0; }

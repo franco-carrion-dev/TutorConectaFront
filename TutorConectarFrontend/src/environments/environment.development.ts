@@ -1,4 +1,6 @@
 export const environment = {
   production: false,
-  base: 'https://tutorconecta.onrender.com'
+  base: 'http://localhost:8080',
+  culqiPublicKey: '',
+  jitsiDomain: 'meet.jit.si',
 };

@@ -1,0 +1,37 @@
+<div class="pantalla">
+  <section class="hero">
+    <div class="marca"><span class="logo"><span class="material-icons">school</span></span>TutorConecta</div>
+    <div>
+      <h1>Refuerzo académico confiable, a un clic.</h1>
+      <ul>
+        <li><span class="material-icons">verified</span>Tutores con identidad verificada y calificaciones reales</li>
+        <li><span class="material-icons">event_available</span>Agenda según la disponibilidad del tutor</li>
+        <li><span class="material-icons">lock</span>Pago seguro antes de confirmar la sesión</li>
+        <li><span class="material-icons">videocam</span>Clases por videollamada integrada</li>
+      </ul>
+    </div>
+    <span class="small">ODS 4 · Educación de calidad — meta 4.1</span>
+  </section>
+
+  <section class="panel">
+    <div class="caja">
+      <h2>Iniciar sesión</h2>
+      <p>Ingresa con tu cuenta de TutorConecta</p>
+      @if (expirada) { <div class="aviso warn" style="margin-bottom:16px">Tu sesión expiró. Vuelve a ingresar.</div> }
+      <form class="form" (ngSubmit)="ingresar()">
+        <label class="campo">Email
+          <input type="email" name="email" [(ngModel)]="email" autocomplete="email" placeholder="tucorreo@ejemplo.com" required>
+        </label>
+        <label class="campo">Contraseña
+          <input type="password" name="password" [(ngModel)]="password" autocomplete="current-password" required>
+        </label>
+        @if (error) { <div class="aviso error">{{ error }}</div> }
+        <button class="btn block" type="submit" [disabled]="cargando">
+          {{ cargando ? 'Ingresando...' : 'Ingresar' }}
+        </button>
+      </form>
+      <p class="pie">¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+      <p class="pie demo muted">Admin de prueba: admin&#64;tutorconecta.com / admin123</p>
+    </div>
+  </section>
+</div>
