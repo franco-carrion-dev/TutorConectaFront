@@ -1,11 +1,10 @@
-﻿export interface UsuarioDTO {
-  idUsuario?: number;
-  nombre?: string;
-  apellido?: string;
-  email?: string;
-  password?: string;
-  telefono?: string;
-  activo?: boolean;
-  rol?: any;
-  [key: string]: any;
+﻿export class UsuarioDTO {
+  idUsuario: number = 0;
+  nombre: string = '';
+  apellido: string = '';
+  email: string = '';
+  passwordHash: string = '';
+  idRol: number = 0;
+  fechaRegistro: string = '';
+  activo: boolean = true;
 }
