@@ -1,8 +1,9 @@
 {
+  "outputDirectory": "dist/TutorConectarFrontend/browser",
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/index.csr.html"
     }
   ]
 }
