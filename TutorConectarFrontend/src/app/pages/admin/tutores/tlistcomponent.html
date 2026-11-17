@@ -1,0 +1,46 @@
+<div class="page-head">
+  <div><h2>Tutores</h2><p>Verifica la identidad de los tutores antes de publicar su perfil</p></div>
+  <a class="btn" routerLink="/admin/tutores/nuevo"><span class="material-icons">add</span>Registrar tutor</a>
+</div>
+<div class="filtros">
+  <label class="campo">Nombre<input placeholder="Buscar tutor" [(ngModel)]="texto" (ngModelChange)="filtrar()"></label>
+  <label class="campo corto">Materia
+    <select [(ngModel)]="idMateria" (ngModelChange)="filtrar()">
+      <option [ngValue]="null">Todas</option>
+      @for (m of d.materias; track m.idMateria) { <option [ngValue]="m.idMateria">{{ m.nombre }}</option> }
+    </select>
+  </label>
+  <label class="campo corto">Verificación
+    <select [(ngModel)]="verif" (ngModelChange)="filtrar()">
+      <option value="">Todos</option><option value="true">Verificados</option><option value="false">Pendientes</option>
+    </select>
+  </label>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>Tutor</th><th>Materias</th><th class="num">Tarifa/h</th><th>Calificación</th><th>Identidad</th><th></th></tr></thead>
+    <tbody>
+      @for (t of lista; track t.idTutor) {
+        <tr>
+          <td><strong>{{ d.nombre(t.idUsuario) }}</strong><div class="small muted">{{ d.usuario(t.idUsuario)?.email }}</div></td>
+          <td class="small">{{ materias(t) }}</td>
+          <td class="num">{{ t.tarifaPorHora | currency:'PEN':'S/ ' }}</td>
+          <td>
+            @let p = d.promedio(t.idTutor);
+            @if (p.n) { <span class="estrellas">{{ (p.prom | estrellas).on }}<span class="off">{{ (p.prom | estrellas).off }}</span></span>
+              <span class="small muted"> {{ p.prom | number:'1.1-1' }} ({{ p.n }})</span> }
+            @else { <span class="muted small">Sin reseñas</span> }
+          </td>
+          <td><span class="chip" [class.ok]="t.verificado" [class.warn]="!t.verificado">{{ t.verificado ? 'Verificado' : 'Pendiente' }}</span></td>
+          <td class="acc">
+            <button class="btn sm" [class.sec]="t.verificado" (click)="verificar(t)">{{ t.verificado ? 'Quitar' : 'Verificar' }}</button>
+            <a class="icon-btn" [routerLink]="['/admin/tutores/editar', t.idTutor]" title="Editar"><span class="material-icons">edit</span></a>
+            <button class="icon-btn rojo" (click)="eliminar(t)" title="Eliminar"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="6"><div class="vacio"><span class="material-icons">school</span>{{ cargando ? 'Cargando...' : 'No hay tutores' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>

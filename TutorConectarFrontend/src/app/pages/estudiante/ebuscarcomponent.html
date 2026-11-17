@@ -1,0 +1,79 @@
+<div class="page-head">
+  <div><h2>Buscar tutores</h2><p>Filtra por materia, precio, calificación y horario. Solo se muestran tutores con identidad verificada.</p></div>
+</div>
+
+<div class="filtros">
+  <label class="campo">Nombre<input placeholder="Nombre del tutor" [(ngModel)]="texto" (ngModelChange)="buscar()"></label>
+  <label class="campo corto">Nivel
+    <select [(ngModel)]="nivel" (ngModelChange)="idMateria = null; buscar()">
+      <option value="">Todos</option>@for (n of niveles; track n) { <option [value]="n">{{ n }}</option> }
+    </select>
+  </label>
+  <label class="campo">Materia
+    <select [(ngModel)]="idMateria" (ngModelChange)="buscar()">
+      <option [ngValue]="null">Todas</option>
+      @for (m of materiasFiltradas(); track m.idMateria) { <option [ngValue]="m.idMateria">{{ m.nombre }} ({{ m.nivelEducativo }})</option> }
+    </select>
+  </label>
+  <label class="campo corto">Precio máx. (S/)<input type="number" min="0" [(ngModel)]="precioMax" (ngModelChange)="buscar()"></label>
+  <label class="campo corto">Calificación
+    <select [(ngModel)]="ratingMin" (ngModelChange)="buscar()">
+      <option [ngValue]="0">Cualquiera</option>@for (n of [4.5,4,3]; track n) { <option [ngValue]="n">{{ n }}+ ★</option> }
+    </select>
+  </label>
+  <label class="campo corto">Día
+    <select [(ngModel)]="dia" (ngModelChange)="buscar()">
+      <option value="">Cualquiera</option>@for (x of dias; track x) { <option [value]="x">{{ x }}</option> }
+    </select>
+  </label>
+  <label class="campo corto">Hora<input type="time" [(ngModel)]="hora" (ngModelChange)="buscar()" [disabled]="!dia"></label>
+  <label class="campo corto">Ordenar
+    <select [(ngModel)]="orden" (ngModelChange)="buscar()">
+      <option value="ia">Recomendación IA</option><option value="precio">Menor precio</option><option value="rating">Mejor calificados</option>
+    </select>
+  </label>
+  <button class="btn sec" (click)="limpiar()">Limpiar</button>
+</div>
+
+@if (orden === 'ia') {
+  <div class="aviso" style="margin-bottom:16px">
+    <span class="material-icons" style="color:var(--accent-700)">auto_awesome</span>
+    <strong>Recomendación inteligente:</strong> ordenamos a los tutores combinando la materia, tu horario, tu presupuesto
+    y las calificaciones de sesiones similares. Se actualiza en cada búsqueda y cada vez que calificas una sesión.
+  </div>
+}
+
+<div class="grid-3">
+  @for (r of resultados; track r.tutor.idTutor; let i = $index) {
+    <div class="card tutor">
+      <div class="cab">
+        <span class="avatar lg">{{ r.nombre | iniciales }}</span>
+        <div>
+          <h3>{{ r.nombre }} <span class="material-icons verif" title="Identidad verificada">verified</span></h3>
+          @if (r.resenas) {
+            <span class="estrellas">{{ (r.rating | estrellas).on }}<span class="off">{{ (r.rating | estrellas).off }}</span></span>
+            <span class="small muted"> {{ r.rating | number:'1.1-1' }} ({{ r.resenas }})</span>
+          } @else { <span class="small muted">Nuevo · sin reseñas</span> }
+        </div>
+      </div>
+      @if (orden === 'ia') {
+        <div class="match">
+          <div class="barra-fila" style="grid-template-columns:auto 1fr auto"><span class="small"><strong>{{ i === 0 ? 'Mejor opción' : 'Afinidad' }}</strong></span>
+            <div class="pista"><div class="relleno acento" [style.width.%]="r.puntaje"></div></div><span class="v">{{ r.puntaje }}%</span></div>
+        </div>
+      }
+      <div>@for (m of materiasDe(r); track m) { <span class="tag">{{ m }}</span> }</div>
+      @if (r.tutor.biografia) { <p class="small muted bio">{{ r.tutor.biografia }}</p> }
+      @if (r.razones.length) {
+        <ul class="razones">@for (x of r.razones; track x) { <li><span class="material-icons">check</span>{{ x }}</li> }</ul>
+      }
+      <div class="pie">
+        <span class="precio">{{ r.tutor.tarifaPorHora | currency:'PEN':'S/ ' }}<span class="small muted"> /hora</span></span>
+        <a class="btn sm" [routerLink]="['/estudiante/tutor', r.tutor.idTutor]">Ver perfil y agendar</a>
+      </div>
+    </div>
+  } @empty {
+    <div class="card vacio" style="grid-column:1/-1"><span class="material-icons">person_search</span>
+      {{ cargando ? 'Buscando tutores...' : 'No encontramos tutores con esos filtros. Prueba ampliando el precio o el horario.' }}</div>
+  }
+</div>
