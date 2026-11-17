@@ -1,0 +1,70 @@
+<div class="page-head">
+  <div><h2>Hola, {{ auth.usuario()?.nombre?.split(' ')?.[0] }} 👋</h2><p>Tu historial de sesiones y progreso por materia</p></div>
+  <a class="btn" routerLink="/estudiante/buscar"><span class="material-icons">search</span>Buscar tutor</a>
+</div>
+
+@if (sinPerfil && !cargando) {
+  <div class="aviso warn" style="margin-bottom:16px">Tu perfil de estudiante no está completo. <a routerLink="/estudiante/perfil">Complétalo aquí</a> para poder agendar sesiones.</div>
+}
+
+<div class="kpis">
+  <div class="kpi"><div class="lbl"><span class="material-icons">event</span>Próximas sesiones</div><div class="val">{{ kpi.proximas }}</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">task_alt</span>Sesiones realizadas</div><div class="val">{{ kpi.realizadas }}</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">schedule</span>Horas de tutoría</div><div class="val">{{ kpi.horas | number:'1.0-1' }}</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">payments</span>Invertido</div><div class="val">{{ kpi.gasto | currency:'PEN':'S/ ':'1.0-0' }}</div></div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Próximas sesiones</h3><a routerLink="/estudiante/sesiones" class="small">Ver todas</a></div>
+    @for (s of proximas.slice(0, 5); track s.idSesion) {
+      <div class="item">
+        <div class="fecha"><strong>{{ s.fechaInicio | date:'dd' }}</strong><span>{{ s.fechaInicio | date:'MMM' }}</span></div>
+        <div class="txt">
+          <strong>{{ d.nombreMateria(s.idMateria) }}</strong>
+          <span class="small muted">{{ d.nombre(s.idTutor) }} · {{ s.fechaInicio | date:'EEE HH:mm' }}–{{ s.fechaFin | date:'HH:mm' }}</span>
+        </div>
+        @if (s.estado === 'pendiente_pago') { <a class="btn sm acento" [routerLink]="['/estudiante/pago', s.idSesion]">Pagar</a> }
+        @else if (puedeUnirse(s)) { <a class="btn sm exito" [routerLink]="['/sala', s.idSesion]"><span class="material-icons">videocam</span>Unirse</a> }
+        @else { <span class="chip" [class]="s.estado">{{ s.estado | etiqueta }}</span> }
+      </div>
+    } @empty { <div class="vacio small"><span class="material-icons">event_available</span>No tienes sesiones próximas</div> }
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Progreso por materia</h3></div>
+    <div class="barras">
+      @for (p of progreso; track p.materia) {
+        <div>
+          <div class="barra-fila"><span class="nom">{{ p.materia }}</span>
+            <div class="pista"><div class="relleno verde" [style.width.%]="p.pct"></div></div><span class="v">{{ p.pct }}%</span></div>
+          <div class="small muted" style="margin:2px 0 0 0">{{ p.nivel }} · {{ p.sesiones }} sesión(es){{ p.obs ? ' · “' + p.obs + '”' : '' }}</div>
+        </div>
+      } @empty { <div class="vacio small"><span class="material-icons">trending_up</span>Tu progreso aparecerá cuando tus tutores registren reportes</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3><span class="material-icons" style="color:var(--accent-500)">auto_awesome</span> Recomendados para ti</h3>
+      <a routerLink="/estudiante/buscar" class="small">Más opciones</a></div>
+    @for (r of recomendados; track r.tutor.idTutor) {
+      <a class="item link" [routerLink]="['/estudiante/tutor', r.tutor.idTutor]">
+        <span class="avatar">{{ r.nombre | iniciales }}</span>
+        <div class="txt"><strong>{{ r.nombre }}</strong><span class="small muted">{{ r.razones.slice(0, 2).join(' · ') || 'Tutor verificado' }}</span></div>
+        <span class="chip info">{{ r.puntaje }}% match</span>
+      </a>
+    } @empty { <div class="vacio small">Aún no hay tutores verificados</div> }
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Historial</h3></div>
+    @for (s of historial; track s.idSesion) {
+      <div class="item">
+        <div class="txt"><strong>{{ d.nombreMateria(s.idMateria) }}</strong>
+          <span class="small muted">{{ d.nombre(s.idTutor) }} · {{ s.fechaInicio | date:'dd/MM/yy' }}</span></div>
+        @if (s.estado === 'realizada' && !d.calificada(s.idSesion)) { <a class="btn sm sec" routerLink="/estudiante/sesiones">Calificar</a> }
+        <span class="chip" [class]="s.estado">{{ s.estado | etiqueta }}</span>
+      </div>
+    } @empty { <div class="vacio small">Sin sesiones anteriores</div> }
+  </div>
+</div>

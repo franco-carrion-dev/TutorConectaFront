@@ -1,0 +1,28 @@
+<div class="page-head">
+  <div><h2>{{ id ? 'Editar bloque de horario' : 'Registrar bloque de horario' }}</h2></div>
+  <a class="btn sec" [routerLink]="base"><span class="material-icons">arrow_back</span>Volver</a>
+</div>
+<div class="card">
+  <form class="form" (ngSubmit)="aceptar()">
+    @if (!esTutor) {
+      <label class="campo">Tutor *
+        <select name="tutor" [(ngModel)]="x.idTutor" required>
+          <option [ngValue]="0" disabled>Selecciona</option>
+          @for (t of d.tutores; track t.idTutor) { <option [ngValue]="t.idTutor">{{ d.nombre(t.idUsuario) }}</option> }
+        </select>
+      </label>
+    }
+    <label class="campo">Día de la semana *
+      <select name="dia" [(ngModel)]="x.diaSemana" required>
+        @for (dia of dias; track dia) { <option [value]="dia">{{ dia }}</option> }
+      </select>
+    </label>
+    <div class="fila">
+      <label class="campo">Hora inicio *<input type="time" name="ini" [(ngModel)]="x.horaInicio" required></label>
+      <label class="campo">Hora fin *<input type="time" name="fin" [(ngModel)]="x.horaFin" required></label>
+    </div>
+    <label class="check"><input type="checkbox" name="disp" [(ngModel)]="x.disponible"> Disponible para agendar</label>
+    @if (error) { <div class="aviso error">{{ error }}</div> }
+    <div class="acciones"><button class="btn" type="submit">Guardar</button><a class="btn sec" [routerLink]="base">Cancelar</a></div>
+  </form>
+</div>

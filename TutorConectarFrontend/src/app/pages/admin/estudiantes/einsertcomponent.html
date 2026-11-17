@@ -1,0 +1,27 @@
+<div class="page-head">
+  <div><h2>{{ esEstudiante ? 'Mi perfil' : (existe ? 'Editar estudiante' : 'Registrar estudiante') }}</h2>
+    <p>Tu presupuesto se usa para recomendarte tutores</p></div>
+  @if (!esEstudiante) { <a class="btn sec" routerLink="/admin/estudiantes"><span class="material-icons">arrow_back</span>Volver</a> }
+</div>
+<div class="card">
+  <form class="form" (ngSubmit)="aceptar()">
+    @if (esEstudiante || existe) {
+      <label class="campo">Estudiante<input [value]="d.nombre(e.idUsuario)" disabled></label>
+      <label class="campo">Email<input [value]="d.usuario(e.idUsuario)?.email ?? ''" disabled></label>
+    } @else {
+      <label class="campo">Usuario *
+        <select name="usuario" [(ngModel)]="e.idUsuario" required>
+          <option [ngValue]="0" disabled>Usuarios con rol ESTUDIANTE sin perfil</option>
+          @for (u of disponibles; track u.idUsuario) { <option [ngValue]="u.idUsuario">{{ u.nombre }} {{ u.apellido }} — {{ u.email }}</option> }
+        </select>
+      </label>
+    }
+    <label class="campo">Presupuesto máximo por hora (S/)
+      <input type="number" min="0" step="0.5" name="pres" [(ngModel)]="e.presupuestoMaximo"></label>
+    @if (error) { <div class="aviso error">{{ error }}</div> }
+    <div class="acciones">
+      <button class="btn" type="submit">Guardar</button>
+      @if (!esEstudiante) { <a class="btn sec" routerLink="/admin/estudiantes">Cancelar</a> }
+    </div>
+  </form>
+</div>

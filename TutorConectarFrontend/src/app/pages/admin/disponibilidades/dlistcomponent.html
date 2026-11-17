@@ -1,0 +1,61 @@
+<div class="page-head">
+  <div><h2>{{ esTutor ? 'Mi disponibilidad' : 'Disponibilidad horaria' }}</h2>
+    <p>{{ esTutor ? 'Los estudiantes solo pueden agendarte dentro de estos bloques' : 'Bloques de horario registrados por cada tutor' }}</p></div>
+  <a class="btn" [routerLink]="base + '/nuevo'"><span class="material-icons">add</span>Registrar bloque</a>
+</div>
+
+@if (esTutor) {
+  <div class="semana">
+    @for (dia of dias; track dia) {
+      <div class="col card">
+        <h3>{{ dia }}</h3>
+        @for (x of delDia(dia); track x.idDisponibilidad) {
+          <div class="bloque" [class.off]="!x.disponible">
+            <strong>{{ hhmm(x.horaInicio) }} – {{ hhmm(x.horaFin) }}</strong>
+            <div class="acc">
+              <button class="icon-btn" (click)="alternar(x)" [title]="x.disponible ? 'Pausar' : 'Activar'">
+                <span class="material-icons">{{ x.disponible ? 'pause' : 'play_arrow' }}</span></button>
+              <a class="icon-btn" [routerLink]="[base + '/editar', x.idDisponibilidad]" title="Editar"><span class="material-icons">edit</span></a>
+              <button class="icon-btn rojo" (click)="eliminar(x)" title="Eliminar"><span class="material-icons">delete</span></button>
+            </div>
+          </div>
+        } @empty { <p class="small muted">Sin bloques</p> }
+      </div>
+    }
+  </div>
+} @else {
+  <div class="filtros">
+    <label class="campo">Tutor
+      <select [(ngModel)]="idTutor" (ngModelChange)="buscar()">
+        <option [ngValue]="null">Todos</option>
+        @for (t of d.tutores; track t.idTutor) { <option [ngValue]="t.idTutor">{{ d.nombre(t.idUsuario) }}</option> }
+      </select>
+    </label>
+    <label class="campo corto">Día de la semana
+      <select [(ngModel)]="dia" (ngModelChange)="buscar()">
+        <option value="">Todos</option>
+        @for (x of dias; track x) { <option [value]="x">{{ x }}</option> }
+      </select>
+    </label>
+  </div>
+  <div class="tabla">
+    <table>
+      <thead><tr><th>Tutor</th><th>Día</th><th>Inicio</th><th>Fin</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        @for (x of lista; track x.idDisponibilidad) {
+          <tr>
+            <td>{{ nombreTutor(x) }}</td><td>{{ x.diaSemana }}</td><td>{{ hhmm(x.horaInicio) }}</td><td>{{ hhmm(x.horaFin) }}</td>
+            <td><span class="chip" [class.ok]="x.disponible">{{ x.disponible ? 'Disponible' : 'No disponible' }}</span></td>
+            <td class="acc">
+              <button class="icon-btn" (click)="alternar(x)" title="Cambiar estado"><span class="material-icons">sync_alt</span></button>
+              <a class="icon-btn" [routerLink]="[base + '/editar', x.idDisponibilidad]" title="Editar"><span class="material-icons">edit</span></a>
+              <button class="icon-btn rojo" (click)="eliminar(x)" title="Eliminar"><span class="material-icons">delete</span></button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6"><div class="vacio"><span class="material-icons">schedule</span>{{ cargando ? 'Cargando...' : 'No hay bloques de horario' }}</div></td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

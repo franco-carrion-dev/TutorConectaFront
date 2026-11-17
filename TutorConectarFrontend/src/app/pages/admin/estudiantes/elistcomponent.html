@@ -1,0 +1,29 @@
+<div class="page-head">
+  <div><h2>Estudiantes</h2><p>Perfiles de estudiantes y su presupuesto declarado</p></div>
+  <a class="btn" routerLink="/admin/estudiantes/nuevo"><span class="material-icons">add</span>Registrar estudiante</a>
+</div>
+<div class="filtros">
+  <label class="campo">Nombre<input placeholder="Buscar estudiante" [(ngModel)]="texto" (ngModelChange)="filtrar()"></label>
+</div>
+<div class="tabla">
+  <table>
+    <thead><tr><th>ID</th><th>Estudiante</th><th>Email</th><th class="num">Presupuesto/h</th><th class="num">Sesiones</th><th></th></tr></thead>
+    <tbody>
+      @for (e of lista; track e.idEstudiante) {
+        <tr>
+          <td>{{ e.idEstudiante }}</td>
+          <td><strong>{{ d.nombre(e.idUsuario) }}</strong></td>
+          <td>{{ d.usuario(e.idUsuario)?.email }}</td>
+          <td class="num">{{ e.presupuestoMaximo != null ? (e.presupuestoMaximo | currency:'PEN':'S/ ') : '—' }}</td>
+          <td class="num">{{ sesiones(e) }}</td>
+          <td class="acc">
+            <a class="icon-btn" [routerLink]="['/admin/estudiantes/editar', e.idEstudiante]" title="Editar"><span class="material-icons">edit</span></a>
+            <button class="icon-btn rojo" (click)="eliminar(e)" title="Eliminar"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="6"><div class="vacio"><span class="material-icons">face</span>{{ cargando ? 'Cargando...' : 'No hay estudiantes' }}</div></td></tr>
+      }
+    </tbody>
+  </table>
+</div>

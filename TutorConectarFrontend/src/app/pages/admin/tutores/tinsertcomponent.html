@@ -1,0 +1,58 @@
+<div class="page-head">
+  <div>
+    <h2>{{ esTutor ? 'Mi perfil de tutor' : (existe ? 'Editar tutor' : 'Registrar tutor') }}</h2>
+    <p>Materias dictadas, tarifa por hora y biografía</p>
+  </div>
+  @if (!esTutor) { <a class="btn sec" routerLink="/admin/tutores"><span class="material-icons">arrow_back</span>Volver</a> }
+</div>
+
+@if (esTutor) {
+  @if (existe && !t.verificado) {
+    <div class="aviso warn" style="margin-bottom:16px">Tu identidad aún no ha sido verificada por un administrador. Tu perfil no aparece en las búsquedas hasta entonces.</div>
+  } @else if (existe) {
+    <div class="aviso ok" style="margin-bottom:16px">Perfil verificado: los estudiantes ya pueden encontrarte.</div>
+  }
+}
+
+<div class="card">
+  <form class="form ancho" (ngSubmit)="aceptar()">
+    @if (!esTutor) {
+      <label class="campo">Usuario *
+        @if (existe) { <input [value]="d.nombre(t.idUsuario)" disabled> }
+        @else {
+          <select name="usuario" [(ngModel)]="t.idUsuario" required>
+            <option [ngValue]="0" disabled>Usuarios con rol TUTOR sin perfil</option>
+            @for (u of disponibles; track u.idUsuario) { <option [ngValue]="u.idUsuario">{{ u.nombre }} {{ u.apellido }} — {{ u.email }}</option> }
+          </select>
+          @if (!disponibles.length) { <span class="ayuda">Primero registra un usuario con rol TUTOR</span> }
+        }
+      </label>
+    }
+    <div class="fila">
+      <label class="campo">Tarifa por hora (S/) *<input type="number" min="1" step="0.5" name="tarifa" [(ngModel)]="t.tarifaPorHora"></label>
+      @if (!esTutor) {
+        <label class="campo">Calificación promedio<input type="number" name="prom" [(ngModel)]="t.calificacionPromedio" disabled></label>
+      }
+    </div>
+    <div class="campo">Materias que dicta *
+      <div class="chips-select">
+        @for (m of d.materias; track m.idMateria) {
+          <label [class.on]="marcada(m.idMateria)">
+            <input type="checkbox" [checked]="marcada(m.idMateria)" (change)="alternar(m.idMateria)"> {{ m.nombre }}
+            <span class="muted small">· {{ m.nivelEducativo }}</span>
+          </label>
+        } @empty { <span class="ayuda">No hay materias registradas todavía</span> }
+      </div>
+    </div>
+    <label class="campo">Biografía<span class="ayuda">Experiencia, estudios y metodología</span>
+      <textarea name="bio" rows="5" [(ngModel)]="t.biografia"></textarea></label>
+    @if (!esTutor) {
+      <label class="check"><input type="checkbox" name="verif" [(ngModel)]="t.verificado"> Identidad verificada (perfil público)</label>
+    }
+    @if (error) { <div class="aviso error">{{ error }}</div> }
+    <div class="acciones">
+      <button class="btn" type="submit">Guardar</button>
+      @if (!esTutor) { <a class="btn sec" routerLink="/admin/tutores">Cancelar</a> }
+    </div>
+  </form>
+</div>

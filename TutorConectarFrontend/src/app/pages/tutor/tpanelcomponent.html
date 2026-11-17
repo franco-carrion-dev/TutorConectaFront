@@ -1,0 +1,51 @@
+<div class="page-head">
+  <div><h2>Hola, {{ auth.usuario()?.nombre?.split(' ')?.[0] }}</h2><p>Tus sesiones, ingresos y reseñas</p></div>
+  <a class="btn" routerLink="/tutor/disponibilidad"><span class="material-icons">schedule</span>Gestionar disponibilidad</a>
+</div>
+
+@if (!cargando) {
+  @if (sinPerfil) {
+    <div class="aviso warn" style="margin-bottom:12px">Aún no tienes perfil de tutor. <a routerLink="/tutor/perfil">Créalo aquí</a> (materias, tarifa y biografía).</div>
+  } @else if (!verificado) {
+    <div class="aviso warn" style="margin-bottom:12px"><strong>Verificación pendiente:</strong> un administrador debe validar tu identidad para que tu perfil sea público.</div>
+  }
+  @if (!sinPerfil && sinMaterias) { <div class="aviso warn" style="margin-bottom:12px">Indica las materias que dictas en <a routerLink="/tutor/perfil">tu perfil</a>.</div> }
+  @if (sinDisponibilidad) { <div class="aviso warn" style="margin-bottom:12px">Registra tu <a routerLink="/tutor/disponibilidad/nuevo">disponibilidad horaria</a> para que puedan agendarte.</div> }
+  @if (porReportar.length) {
+    <div class="aviso" style="margin-bottom:12px">Tienes {{ porReportar.length }} sesión(es) que ya terminaron. <a routerLink="/tutor/sesiones">Márcalas como realizadas</a> y registra el reporte de progreso.</div>
+  }
+}
+
+<div class="kpis">
+  <div class="kpi"><div class="lbl"><span class="material-icons">event</span>Próximas</div><div class="val">{{ kpi.proximas }}</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">task_alt</span>Realizadas</div><div class="val">{{ kpi.realizadas }}</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">payments</span>Ingresos</div><div class="val">{{ kpi.ingresos | currency:'PEN':'S/ ':'1.0-0' }}</div><div class="sub">Pagos completados</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">star</span>Calificación</div>
+    <div class="val">{{ kpi.n ? (kpi.rating | number:'1.1-1') : '—' }}</div><div class="sub">{{ kpi.n }} reseñas</div></div>
+  <div class="kpi"><div class="lbl"><span class="material-icons">event_busy</span>Cancelación</div><div class="val">{{ kpi.cancelacion * 100 | number:'1.0-0' }}%</div></div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Próximas sesiones</h3><a class="small" routerLink="/tutor/sesiones">Ver todas</a></div>
+    @for (s of proximas.slice(0, 6); track s.idSesion) {
+      <div class="item">
+        <div class="fecha"><strong>{{ s.fechaInicio | date:'dd' }}</strong><span>{{ s.fechaInicio | date:'MMM' }}</span></div>
+        <div class="txt"><strong>{{ d.nombreMateria(s.idMateria) }}</strong>
+          <span class="small muted">{{ d.nombre(s.idEstudiante) }} · {{ s.fechaInicio | date:'EEE HH:mm' }}–{{ s.fechaFin | date:'HH:mm' }}</span></div>
+        @if (puedeUnirse(s)) { <a class="btn sm exito" [routerLink]="['/sala', s.idSesion]"><span class="material-icons">videocam</span>Unirse</a> }
+        @else { <span class="chip agendada">{{ s.estado | etiqueta }}</span> }
+      </div>
+    } @empty { <div class="vacio small"><span class="material-icons">event_available</span>Sin sesiones agendadas</div> }
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Últimas reseñas</h3></div>
+    @for (c of resenas; track c.idCalificacion) {
+      <div class="item" style="align-items:flex-start"><div class="txt">
+        <span><span class="estrellas">{{ (c.puntuacion | estrellas).on }}<span class="off">{{ (c.puntuacion | estrellas).off }}</span></span>
+          <span class="small muted"> · {{ d.nombre(d.sesion(c.idSesion)?.idEstudiante) }} · {{ c.fechaCalificacion | date:'dd/MM/yy' }}</span></span>
+        @if (c.comentario) { <span class="small">{{ c.comentario }}</span> }
+      </div></div>
+    } @empty { <div class="vacio small">Aún no tienes reseñas</div> }
+  </div>
+</div>
