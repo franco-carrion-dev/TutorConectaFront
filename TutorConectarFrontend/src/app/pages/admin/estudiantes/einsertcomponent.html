@@ -17,7 +17,9 @@
       </label>
     }
     <label class="campo">Presupuesto máximo por hora (S/)
-      <input type="number" min="0" step="0.5" name="pres" [(ngModel)]="e.presupuestoMaximo"></label>
+      <input type="number" min="0" step="0.5" name="pres" [(ngModel)]="e.presupuestoMaximo" [class.invalido]="errPresupuesto(e.presupuestoMaximo)">
+      @if (errPresupuesto(e.presupuestoMaximo)) { <span class="err">{{ errPresupuesto(e.presupuestoMaximo) }}</span> }
+    </label>
     @if (error) { <div class="aviso error">{{ error }}</div> }
     <div class="acciones">
       <button class="btn" type="submit">Guardar</button>

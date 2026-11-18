@@ -11,6 +11,7 @@ import { normalizar } from '../../../core/fechas';
   selector: 'app-mlist',
   imports: [FormsModule, RouterLink],
   templateUrl: './mlistcomponent.html',
+  styleUrl: './mlistcomponent.css',
 })
 export class Mlistcomponent implements OnInit {
   private mS = inject(Materiaservice)

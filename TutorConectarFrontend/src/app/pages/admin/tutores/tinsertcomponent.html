@@ -29,7 +29,11 @@
       </label>
     }
     <div class="fila">
-      <label class="campo">Tarifa por hora (S/) *<input type="number" min="1" step="0.5" name="tarifa" [(ngModel)]="t.tarifaPorHora"></label>
+      <label class="campo">Tarifa por hora (S/) *
+        <input type="number" min="1" step="0.5" name="tarifa" [(ngModel)]="t.tarifaPorHora" #tar="ngModel"
+          [class.invalido]="(tar.touched || enviado) && errTarifa(t.tarifaPorHora)">
+        @if ((tar.touched || enviado) && errTarifa(t.tarifaPorHora)) { <span class="err">{{ errTarifa(t.tarifaPorHora) }}</span> }
+      </label>
       @if (!esTutor) {
         <label class="campo">Calificación promedio<input type="number" name="prom" [(ngModel)]="t.calificacionPromedio" disabled></label>
       }

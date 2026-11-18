@@ -190,3 +190,8 @@ input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, textarea.ng-invalid.n
 .item .fecha strong { font-size: 18px; }
 .item .fecha span { font-size: 11px; text-transform: uppercase; }
 .card-head h3 { display: flex; align-items: center; gap: 6px; }
+
+/* ===== Mensajes de validación por campo ===== */
+input.invalido, select.invalido, textarea.invalido { border-color: var(--error-700); box-shadow: 0 0 0 3px var(--error-100); }
+.campo .err { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+.campo .err::before { content: "⚠"; }

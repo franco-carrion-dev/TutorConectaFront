@@ -1,0 +1,8 @@
+.materias { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.materia { display: flex; flex-direction: column; gap: 10px; margin: 0 !important; transition: box-shadow .15s, transform .15s; }
+.materia:hover { box-shadow: var(--sh2); transform: translateY(-2px); }
+.cab { display: flex; align-items: center; justify-content: space-between; }
+.icono { width: 40px; height: 40px; border-radius: 10px; background: var(--primary-50); color: var(--primary-700); display: inline-flex; align-items: center; justify-content: center; }
+.nivel { background: var(--accent-100); color: var(--accent-700); font-weight: 600; }
+.desc { flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pie { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-top: 10px; border-top: 1px solid var(--gray-100); }

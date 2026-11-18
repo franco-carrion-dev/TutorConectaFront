@@ -5,12 +5,13 @@
 <div class="card">
   <form class="form" (ngSubmit)="aceptar()">
     <label class="campo">Sesión realizada *
-      <select name="ses" [(ngModel)]="c.idSesion" (ngModelChange)="alElegir()" required>
+      <select name="ses" [(ngModel)]="c.idSesion" (ngModelChange)="alElegir()" required [class.invalido]="enviado && !c.idSesion">
         <option [ngValue]="0" disabled>Selecciona</option>
         @for (s of sesionesRealizadas(); track s.idSesion) {
           <option [ngValue]="s.idSesion">#{{ s.idSesion }} · {{ d.nombreMateria(s.idMateria) }} · {{ d.nombre(s.idTutor) }} · {{ s.fechaInicio | date:'dd/MM/yy' }}</option>
         }
       </select>
+      @if (enviado && !c.idSesion) { <span class="err">Selecciona la sesión que vas a calificar</span> }
     </label>
     <label class="campo">Tutor<input [value]="d.nombre(c.idTutor)" disabled></label>
     <div class="campo">Puntuación *
@@ -18,7 +19,9 @@
         @for (n of [1,2,3,4,5]; track n) {
           <button type="button" class="star" [class.on]="n <= c.puntuacion" (click)="c.puntuacion = n" [attr.aria-label]="n + ' estrellas'">★</button>
         }
+        @if (c.puntuacion) { <span class="muted" style="align-self:center">{{ c.puntuacion }} de 5</span> }
       </div>
+      @if (enviado && errPuntuacion(c.puntuacion)) { <span class="err">{{ errPuntuacion(c.puntuacion) }}</span> }
     </div>
     <label class="campo">Comentario<textarea name="com" [(ngModel)]="c.comentario"></textarea></label>
     @if (error) { <div class="aviso error">{{ error }}</div> }

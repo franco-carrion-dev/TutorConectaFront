@@ -9,6 +9,7 @@ import { Promedioservice } from '../../../core/promedioservice';
 import { Toastservice } from '../../../core/toastservice';
 import { CalificacionDTO } from '../../../models/CalificacionDTO';
 import { ahora } from '../../../core/fechas';
+import { errPuntuacion } from '../../../shared/validaciones';
 
 @Component({
   selector: 'app-cinsert',
@@ -26,6 +27,8 @@ export class Cinsertcomponent implements OnInit {
   d = new Datos()
   id = 0
   error = ''
+  enviado = false
+  errPuntuacion = errPuntuacion
 
   ngOnInit() {
     this.id = Number(this.route.snapshot.paramMap.get('id') ?? 0)
@@ -33,6 +36,7 @@ export class Cinsertcomponent implements OnInit {
       this.d = d
       const a = d.calificaciones.find(x => x.idCalificacion === this.id)
       if (a) this.c = { ...a }
+      else this.c.puntuacion = 0
     })
   }
   sesionesRealizadas() { return this.d.sesiones.filter(s => s.estado === 'realizada' || s.idSesion === this.c.idSesion) }
@@ -40,8 +44,8 @@ export class Cinsertcomponent implements OnInit {
 
   aceptar() {
     this.error = ''
-    if (!this.c.idSesion || !this.c.idTutor) { this.error = 'Selecciona la sesión'; return }
-    if (this.c.puntuacion < 1 || this.c.puntuacion > 5) { this.error = 'La puntuación va de 1 a 5'; return }
+    this.enviado = true
+    if (!this.c.idSesion || !this.c.idTutor || errPuntuacion(this.c.puntuacion)) { this.error = 'Revisa los campos marcados'; return }
     const body = { ...this.c, fechaCalificacion: this.c.fechaCalificacion || ahora() }
     const obs = this.id ? this.cS.update(this.id, body) : this.cS.insert(body)
     obs.pipe(switchMap(() => this.prom.recalcular(this.c.idTutor))).subscribe({

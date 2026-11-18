@@ -35,12 +35,19 @@
           <label class="campo">Repetir *<input type="password" name="confirmar" [(ngModel)]="confirmar" required></label>
         </div>
         @if (dto.rol === 'TUTOR') {
-          <label class="campo">Tarifa por hora (S/) *<input type="number" min="1" name="tarifa" [(ngModel)]="dto.tarifaPorHora"></label>
+          <label class="campo">Tarifa por hora (S/) *
+            <input type="number" min="1" name="tarifa" [(ngModel)]="dto.tarifaPorHora" #tar="ngModel"
+              [class.invalido]="(tar.touched || enviado) && errTarifa(dto.tarifaPorHora)">
+            @if ((tar.touched || enviado) && errTarifa(dto.tarifaPorHora)) { <span class="err">{{ errTarifa(dto.tarifaPorHora) }}</span> }
+          </label>
           <label class="campo">Biografía <span class="ayuda">Tu experiencia, estudios y cómo enseñas</span>
             <textarea name="bio" [(ngModel)]="dto.biografia"></textarea></label>
         } @else {
           <label class="campo">Presupuesto máximo por hora (S/) <span class="ayuda">Lo usamos para recomendarte tutores</span>
-            <input type="number" min="0" name="presupuesto" [(ngModel)]="dto.presupuestoMaximo"></label>
+            <input type="number" min="0" name="presupuesto" [(ngModel)]="dto.presupuestoMaximo"
+              [class.invalido]="errPresupuesto(dto.presupuestoMaximo)">
+            @if (errPresupuesto(dto.presupuestoMaximo)) { <span class="err">{{ errPresupuesto(dto.presupuestoMaximo) }}</span> }
+          </label>
         }
         @if (error) { <div class="aviso error">{{ error }}</div> }
         <button class="btn block" type="submit" [disabled]="cargando">{{ cargando ? 'Creando cuenta...' : 'Crear cuenta' }}</button>

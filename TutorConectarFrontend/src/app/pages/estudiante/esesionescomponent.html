@@ -44,6 +44,7 @@
       <div class="stars" style="justify-content:center;margin-bottom:12px">
         @for (n of [1,2,3,4,5]; track n) { <button type="button" class="star" [class.on]="n <= cal.puntuacion" (click)="cal.puntuacion = n">★</button> }
       </div>
+      @if (enviado && errPuntuacion(cal.puntuacion)) { <div class="aviso error" style="margin-bottom:12px">{{ errPuntuacion(cal.puntuacion) }}</div> }
       <label class="campo">Comentario (opcional)<textarea [(ngModel)]="cal.comentario" placeholder="¿Qué tal estuvo la clase?"></textarea></label>
       <div class="pie"><button class="btn sec" (click)="calificando = null">Cancelar</button><button class="btn" (click)="enviarCalificacion()">Enviar</button></div>
     </div>

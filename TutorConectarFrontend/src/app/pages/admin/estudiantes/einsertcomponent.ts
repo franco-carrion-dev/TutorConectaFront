@@ -7,6 +7,7 @@ import { Toastservice } from '../../../core/toastservice';
 import { Loginservice } from '../../../core/loginservice';
 import { EstudianteDTO } from '../../../models/EstudianteDTO';
 import { UsuarioDTO } from '../../../models/UsuarioDTO';
+import { errPresupuesto } from '../../../shared/validaciones';
 
 /** Formulario de estudiante. Lo usa el admin y el propio estudiante (/estudiante/perfil) */
 @Component({
@@ -28,6 +29,7 @@ export class Einsertcomponent implements OnInit {
   existe = false
   esEstudiante = false
   error = ''
+  errPresupuesto = errPresupuesto
 
   ngOnInit() {
     this.esEstudiante = this.auth.rol() === 'ESTUDIANTE'
@@ -44,7 +46,7 @@ export class Einsertcomponent implements OnInit {
 
   aceptar() {
     if (!this.e.idUsuario) { this.error = 'Selecciona el usuario'; return }
-    if (this.e.presupuestoMaximo != null && this.e.presupuestoMaximo < 0) { this.error = 'El presupuesto no puede ser negativo'; return }
+    if (errPresupuesto(this.e.presupuestoMaximo)) { this.error = errPresupuesto(this.e.presupuestoMaximo); return }
     const p = this.existe ? this.eS.update(this.e.idEstudiante, this.e) : this.eS.insert(this.e)
     p.subscribe({
       next: () => {

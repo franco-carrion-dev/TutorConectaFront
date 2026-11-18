@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Loginservice, RegistroDTO } from '../../core/loginservice';
 import { Toastservice } from '../../core/toastservice';
+import { errPresupuesto, errTarifa } from '../../shared/validaciones';
 
 @Component({
   selector: 'app-registro',
@@ -18,6 +19,9 @@ export class Registrocomponent {
   confirmar = ''
   error = ''
   cargando = false
+  enviado = false
+  errTarifa = errTarifa
+  errPresupuesto = errPresupuesto
 
   registrar() {
     this.error = ''
@@ -26,7 +30,9 @@ export class Registrocomponent {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) { this.error = 'El email no es válido'; return }
     if (d.password.length < 6) { this.error = 'La contraseña debe tener al menos 6 caracteres'; return }
     if (d.password !== this.confirmar) { this.error = 'Las contraseñas no coinciden'; return }
-    if (d.rol === 'TUTOR' && (!d.tarifaPorHora || d.tarifaPorHora <= 0)) { this.error = 'Indica tu tarifa por hora'; return }
+    this.enviado = true
+    if (d.rol === 'TUTOR' && errTarifa(d.tarifaPorHora)) { this.error = errTarifa(d.tarifaPorHora); return }
+    if (d.rol === 'ESTUDIANTE' && errPresupuesto(d.presupuestoMaximo)) { this.error = errPresupuesto(d.presupuestoMaximo); return }
 
     this.cargando = true
     this.auth.registro(d).subscribe({

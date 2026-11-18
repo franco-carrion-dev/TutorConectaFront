@@ -7,6 +7,7 @@ import { Toastservice } from '../../../core/toastservice';
 import { Loginservice } from '../../../core/loginservice';
 import { TutorDTO } from '../../../models/TutorDTO';
 import { UsuarioDTO } from '../../../models/UsuarioDTO';
+import { errTarifa } from '../../../shared/validaciones';
 
 /** Formulario de tutor. Lo usa el admin (/admin/tutores) y el propio tutor (/tutor/perfil) */
 @Component({
@@ -29,6 +30,8 @@ export class Tinsertcomponent implements OnInit {
   esTutor = false
   existe = false
   error = ''
+  enviado = false
+  errTarifa = errTarifa
 
   ngOnInit() {
     this.esTutor = this.auth.rol() === 'TUTOR'
@@ -50,6 +53,8 @@ export class Tinsertcomponent implements OnInit {
 
   aceptar() {
     this.error = ''
+    this.enviado = true
+    if (errTarifa(this.t.tarifaPorHora)) { this.error = 'Revisa los campos marcados'; return }
     if (!this.t.idUsuario) { this.error = 'Selecciona el usuario'; return }
     if (!this.t.tarifaPorHora || this.t.tarifaPorHora <= 0) { this.error = 'La tarifa debe ser mayor a 0'; return }
     if (!this.t.idMaterias.length) { this.error = 'Selecciona al menos una materia que dictes'; return }

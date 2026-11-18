@@ -10,6 +10,7 @@ import { Toastservice } from '../../../core/toastservice';
 import { UsuarioDTO } from '../../../models/UsuarioDTO';
 import { RolDTO } from '../../../models/RolDTO';
 import { ahora } from '../../../core/fechas';
+import { errPresupuesto, errTarifa } from '../../../shared/validaciones';
 
 @Component({
   selector: 'app-uinsert',
@@ -31,6 +32,9 @@ export class Uinsertcomponent implements OnInit {
   edicion = false
   error = ''
   guardando = false
+  enviado = false
+  errTarifa = errTarifa
+  errPresupuesto = errPresupuesto
   // datos del perfil al crear
   tarifa: number | null = null
   biografia = ''
@@ -56,7 +60,9 @@ export class Uinsertcomponent implements OnInit {
     if (!u.nombre || !u.apellido || !u.email || !u.idRol) { this.error = 'Completa nombre, apellido, email y rol'; return }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(u.email)) { this.error = 'Email no válido'; return }
     if (!this.edicion && (!u.passwordHash || u.passwordHash.length < 6)) { this.error = 'La contraseña debe tener al menos 6 caracteres'; return }
-    if (!this.edicion && this.rolNombre() === 'TUTOR' && !this.tarifa) { this.error = 'Indica la tarifa por hora del tutor'; return }
+    this.enviado = true
+    if (!this.edicion && this.rolNombre() === 'TUTOR' && errTarifa(this.tarifa)) { this.error = errTarifa(this.tarifa); return }
+    if (!this.edicion && this.rolNombre() === 'ESTUDIANTE' && errPresupuesto(this.presupuesto)) { this.error = errPresupuesto(this.presupuesto); return }
 
     this.guardando = true
     if (this.edicion) {

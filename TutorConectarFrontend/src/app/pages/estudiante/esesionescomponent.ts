@@ -16,6 +16,7 @@ import { CalificacionDTO } from '../../models/CalificacionDTO';
 import { ReporteProgresoDTO } from '../../models/ReporteProgresoDTO';
 import { EtiquetaPipe } from '../../shared/pipes';
 import { ahora } from '../../core/fechas';
+import { errPuntuacion } from '../../shared/validaciones';
 
 @Component({
   selector: 'app-esesiones',
@@ -42,6 +43,8 @@ export class Esesionescomponent implements OnInit {
   cal = new CalificacionDTO()
   // modal reporte
   viendo: SesionDTO | null = null
+  enviado = false
+  errPuntuacion = errPuntuacion
 
   ngOnInit() { this.cargar() }
 
@@ -83,10 +86,13 @@ export class Esesionescomponent implements OnInit {
 
   abrirCalificar(s: SesionDTO) {
     this.calificando = s
-    this.cal = { ...new CalificacionDTO(), idSesion: s.idSesion, idTutor: s.idTutor, puntuacion: 5 }
+    this.enviado = false
+    this.cal = { ...new CalificacionDTO(), idSesion: s.idSesion, idTutor: s.idTutor, puntuacion: 0 }
   }
 
   enviarCalificacion() {
+    this.enviado = true
+    if (errPuntuacion(this.cal.puntuacion)) return
     const s = this.calificando!
     const body = { ...this.cal, fechaCalificacion: ahora() }
     this.cS.insert(body).pipe(switchMap(() => this.prom.recalcular(s.idTutor))).subscribe({
