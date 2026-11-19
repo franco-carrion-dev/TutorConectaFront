@@ -22,6 +22,6 @@ export class Toastservice {
   private push(texto: string, tipo: Toast['tipo']) {
     const id = ++this.n
     this.toasts.update(l => [...l, { id, texto, tipo }])
-    setTimeout(() => this.cerrar(id), 4500)
+    setTimeout(() => this.cerrar(id), 5000)
   }
 }

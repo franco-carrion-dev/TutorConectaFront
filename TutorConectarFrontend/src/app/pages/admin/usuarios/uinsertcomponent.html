@@ -41,7 +41,7 @@
     @if (error) { <div class="aviso error">{{ error }}</div> }
     <div class="acciones">
       <button class="btn" type="submit" [disabled]="guardando">{{ guardando ? 'Guardando...' : 'Guardar' }}</button>
-      <a class="btn sec" routerLink="/admin/usuarios">Cancelar</a>
+      <a class="btn ghost" routerLink="/admin/usuarios">Cancelar</a>
     </div>
   </form>
 </div>

@@ -22,6 +22,6 @@
     </div>
     <label class="campo">Observaciones<textarea name="obs" rows="5" [(ngModel)]="r.observaciones" placeholder="Temas vistos, dificultades, tareas recomendadas..."></textarea></label>
     @if (error) { <div class="aviso error">{{ error }}</div> }
-    <div class="acciones"><button class="btn" type="submit">Guardar</button><a class="btn sec" [routerLink]="base">Cancelar</a></div>
+    <div class="acciones"><button class="btn" type="submit">Guardar</button><a class="btn ghost" [routerLink]="base">Cancelar</a></div>
   </form>
 </div>

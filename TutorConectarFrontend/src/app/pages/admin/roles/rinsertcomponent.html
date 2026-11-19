@@ -7,6 +7,6 @@
     <label class="campo">Denominación *<input name="den" [(ngModel)]="r.denominacion" placeholder="ADMIN, TUTOR, ESTUDIANTE..." required></label>
     <label class="campo">Descripción<textarea name="desc" [(ngModel)]="r.descripcion"></textarea></label>
     @if (error) { <div class="aviso error">{{ error }}</div> }
-    <div class="acciones"><button class="btn" type="submit">Guardar</button><a class="btn sec" routerLink="/admin/roles">Cancelar</a></div>
+    <div class="acciones"><button class="btn" type="submit">Guardar</button><a class="btn ghost" routerLink="/admin/roles">Cancelar</a></div>
   </form>
 </div>
