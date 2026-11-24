@@ -4,8 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Datos, Datosservice } from '../../core/datosservice';
 import { EstrellasPipe } from '../../shared/pipes';
+import { ETIQUETA_ESTADO } from '../../models/Constantes';
 
-interface Barra { nombre: string; valor: number; pct: number; extra?: string }
+interface Barra { nombre: string; valor: number; pct: number; extra?: string; color?: string }
+interface Seg { nombre: string; valor: number; color: string; pct: number }
 interface Mes { mes: string; agendada: number; realizada: number; cancelada: number; pendiente_pago: number; total: number }
 
 /** Reportes y dashboards de la propuesta (sección 10) */
@@ -29,13 +31,22 @@ export class Dashboardcomponent implements OnInit {
   demanda: Barra[] = []
   cancelacion: Barra[] = []
   ranking: { nombre: string; prom: number; n: number; tarifa: number }[] = []
+  usuariosRol: Seg[] = []
+  donaRol = ''
+  totalUsuarios = 0
+  pagosEstado: Seg[] = []
+  tortaPagos = ''
+  ingresosMes: Barra[] = []
+  linea = { puntos: '', area: '', marcas: [] as { x: number; y: number; v: number; et: string }[] }
+  distCalif: Barra[] = []
+  horasDia: Barra[] = []
 
   ngOnInit() {
     const hoy = new Date()
     const ini = new Date(hoy.getFullYear(), hoy.getMonth() - 5, 1)
     this.desde = ini.toISOString().substring(0, 10)
     this.hasta = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0).toISOString().substring(0, 10)
-    this.dS.cargar(['sesiones', 'pagos', 'calificaciones', 'tutores', 'estudiantes', 'usuarios', 'materias'])
+    this.dS.cargar(['sesiones', 'pagos', 'calificaciones', 'tutores', 'estudiantes', 'usuarios', 'materias', 'roles', 'disponibilidades'])
       .subscribe(d => { this.d = d; this.cargando = false; this.calcular() })
   }
 
@@ -111,9 +122,82 @@ export class Dashboardcomponent implements OnInit {
     // 5) Ranking de tutores mejor calificados
     this.ranking = d.tutores.map(t => ({ nombre: d.nombre(t.idUsuario), ...d.promedio(t.idTutor), tarifa: Number(t.tarifaPorHora) }))
       .filter(x => x.n > 0).sort((a, b) => b.prom - a.prom || b.n - a.n).slice(0, 10)
+
+    // 6) Usuarios por rol (total y activos)
+    const porRol = new Map<number, { t: number; a: number }>()
+    d.usuarios.forEach(u => {
+      const x = porRol.get(u.idRol) ?? { t: 0, a: 0 }
+      x.t++; if (u.activo) x.a++
+      porRol.set(u.idRol, x)
+    })
+    const colRol = ['var(--primary-700)', 'var(--accent-500)', 'var(--success-700)', 'var(--info-700)', 'var(--error-700)']
+    this.usuariosRol = this.segmentos([...porRol].map(([id, x], i) => ({ nombre: `${d.nombreRol(id)} (${x.a} activos)`, valor: x.t, color: colRol[i % colRol.length] })))
+    this.totalUsuarios = d.usuarios.length
+    this.donaRol = this.conico(this.usuariosRol)
+
+    // 7) Pagos por estado (de las sesiones del periodo)
+    const colorPago: Record<string, string> = {
+      PENDIENTE: 'var(--warning-700)', COMPLETADO: 'var(--success-700)', EN_DISPUTA: 'var(--accent-500)',
+      REEMBOLSADO: 'var(--gray-500)', RECHAZADO: 'var(--error-700)',
+    }
+    const pagosPer = d.pagos.filter(p => idsSes.has(p.idSesion))
+    this.pagosEstado = this.segmentos(Object.keys(colorPago).map(e => ({
+      nombre: ETIQUETA_ESTADO[e] ?? e, valor: pagosPer.filter(p => p.estado === e).length, color: colorPago[e],
+    })).filter(x => x.valor > 0))
+    this.tortaPagos = this.conico(this.pagosEstado)
+
+    // 8) Ingresos por mes (pagos completados)
+    const ingMes = new Map<string, number>()
+    pagosOk.forEach(p => {
+      const k = (p.fechaPago || d.sesion(p.idSesion)?.fechaInicio || '').substring(0, 7)
+      if (k) ingMes.set(k, (ingMes.get(k) ?? 0) + Number(p.monto))
+    })
+    const maxIng = Math.max(1, ...ingMes.values())
+    this.ingresosMes = [...ingMes].sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([k, v]) => ({ nombre: this.nombreMes(k), valor: v, pct: (v / maxIng) * 100 }))
+    // coordenadas del gráfico de línea (viewBox 320 x 160, margen 20)
+    const n = this.ingresosMes.length
+    const pts = this.ingresosMes.map((b, i) => ({
+      x: n === 1 ? 160 : 20 + (i * 280) / (n - 1), y: 140 - (b.valor / maxIng) * 110, v: b.valor, et: b.nombre,
+    }))
+    this.linea = {
+      puntos: pts.map(p => `${p.x},${p.y}`).join(' '),
+      area: pts.length ? `${pts[0].x},140 ${pts.map(p => `${p.x},${p.y}`).join(' ')} ${pts[pts.length - 1].x},140` : '',
+      marcas: pts,
+    }
+
+    // 9) Distribución de calificaciones (1 a 5 estrellas)
+    const califs = d.calificaciones.filter(c => idsSes.has(c.idSesion))
+    const maxCal = Math.max(1, ...[1, 2, 3, 4, 5].map(n => califs.filter(c => c.puntuacion === n).length))
+    this.distCalif = [1, 2, 3, 4, 5].map(n => {
+      const v = califs.filter(c => c.puntuacion === n).length
+      return { nombre: '★'.repeat(n), valor: v, pct: (v / maxCal) * 100 }
+    })
+
+    // 10) Horas de disponibilidad de los tutores por día de la semana
+    const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+    const norm = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    const hrs = (a: string, b: string) => {
+      const [h1, m1] = a.split(':').map(Number), [h2, m2] = b.split(':').map(Number)
+      return Math.max(0, (h2 * 60 + m2 - h1 * 60 - m1) / 60)
+    }
+    const porDia = dias.map(di => d.disponibilidades.filter(x => x.disponible && norm(x.diaSemana) === norm(di))
+      .reduce((a, x) => a + hrs(x.horaInicio, x.horaFin), 0))
+    const maxDia = Math.max(1, ...porDia)
+    this.horasDia = dias.map((di, i) => ({ nombre: di, valor: porDia[i], pct: (porDia[i] / maxDia) * 100 }))
   }
 
-  private barras(l: { nombre: string; valor: number }[]): Barra[] {
+  private segmentos(l: { nombre: string; valor: number; color: string }[]): Seg[] {
+    const tot = l.reduce((a, x) => a + x.valor, 0) || 1
+    return l.filter(x => x.valor > 0).map(x => ({ ...x, pct: (x.valor / tot) * 100 }))
+  }
+  /** conic-gradient para gráficos de dona y torta */
+  private conico(l: Seg[]): string {
+    if (!l.length) return 'var(--gray-100)'
+    let acc = 0
+    return 'conic-gradient(' + l.map(x => { const a = acc; acc += x.pct; return `${x.color} ${a}% ${acc}%` }).join(', ') + ')'
+  }
+  private barras(l: { nombre: string; valor: number; extra?: string; color?: string }[]): Barra[] {
     const max = Math.max(1, ...l.map(x => x.valor))
     return l.sort((a, b) => b.valor - a.valor).slice(0, 8).map(x => ({ ...x, pct: (x.valor / max) * 100 }))
   }

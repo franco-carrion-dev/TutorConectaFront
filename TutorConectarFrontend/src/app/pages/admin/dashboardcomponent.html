@@ -32,7 +32,7 @@
   <div class="card">
     <div class="card-head"><h3>Sesiones por mes</h3></div>
     <div class="leyenda">
-      <span><i style="background:var(--success-700)"></i>Agendadas</span><span><i style="background:var(--primary-600)"></i>Realizadas</span>
+      <span><i style="background:var(--info-700)"></i>Agendadas</span><span><i style="background:var(--success-700)"></i>Realizadas</span>
       <span><i style="background:var(--error-700)"></i>Canceladas</span><span><i style="background:var(--accent-500)"></i>Pendiente de pago</span>
     </div>
     <div class="apiladas">
@@ -40,8 +40,8 @@
         <div class="apilada">
           <span>{{ nombreMes(m.mes) }}</span>
           <div class="pista" [style.width.%]="(m.total / maxMes) * 100">
-            <span [style.flex]="m.agendada" style="background:var(--success-700)" [title]="m.agendada + ' agendadas'"></span>
-            <span [style.flex]="m.realizada" style="background:var(--primary-600)" [title]="m.realizada + ' realizadas'"></span>
+            <span [style.flex]="m.agendada" style="background:var(--info-700)" [title]="m.agendada + ' agendadas'"></span>
+            <span [style.flex]="m.realizada" style="background:var(--success-700)" [title]="m.realizada + ' realizadas'"></span>
             <span [style.flex]="m.cancelada" style="background:var(--error-700)" [title]="m.cancelada + ' canceladas'"></span>
             <span [style.flex]="m.pendiente_pago" style="background:var(--accent-500)" [title]="m.pendiente_pago + ' pendientes'"></span>
           </div>
@@ -89,6 +89,68 @@
           <div class="pista"><div class="relleno rojo" [style.width.%]="b.pct"></div></div>
           <span class="v">{{ b.valor | percent:'1.0-0' }} <span class="muted small">({{ b.extra }})</span></span></div>
       } @empty { <div class="vacio small">Sin sesiones</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Usuarios por rol</h3><span class="small muted">dona</span></div>
+    @if (usuariosRol.length) {
+      <div class="circular">
+        <div class="dona" [style.background]="donaRol"><div class="centro"><strong>{{ totalUsuarios }}</strong><span>usuarios</span></div></div>
+        <ul class="leyenda-v">
+          @for (s of usuariosRol; track s.nombre) { <li><i [style.background]="s.color"></i>{{ s.nombre }}<strong>{{ s.valor }}</strong></li> }
+        </ul>
+      </div>
+    } @else { <div class="vacio small">Sin usuarios</div> }
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Pagos por estado</h3><span class="small muted">torta</span></div>
+    @if (pagosEstado.length) {
+      <div class="circular">
+        <div class="dona torta" [style.background]="tortaPagos"></div>
+        <ul class="leyenda-v">
+          @for (s of pagosEstado; track s.nombre) { <li><i [style.background]="s.color"></i>{{ s.nombre }}<strong>{{ s.pct | number:'1.0-0' }}%</strong></li> }
+        </ul>
+      </div>
+    } @else { <div class="vacio small">Sin pagos en el periodo</div> }
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Ingresos por mes</h3><span class="small muted">S/ · línea</span></div>
+    @if (ingresosMes.length) {
+      <svg class="linea" viewBox="0 0 320 170" role="img" aria-label="Ingresos por mes">
+        <line x1="20" y1="140" x2="300" y2="140" class="eje" />
+        <polygon [attr.points]="linea.area" class="area" />
+        <polyline [attr.points]="linea.puntos" class="trazo" />
+        @for (p of linea.marcas; track p.et) {
+          <circle [attr.cx]="p.x" [attr.cy]="p.y" r="4" class="punto"><title>{{ p.et }}: S/ {{ p.v }}</title></circle>
+          <text [attr.x]="p.x" [attr.y]="p.y - 9" class="valor">{{ p.v | number:'1.0-0' }}</text>
+          <text [attr.x]="p.x" y="158" class="etq">{{ p.et }}</text>
+        }
+      </svg>
+    } @else { <div class="vacio small">Sin pagos completados</div> }
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Distribución de calificaciones</h3><span class="small muted">columnas</span></div>
+    <div class="columnas">
+      @for (b of distCalif; track b.nombre) {
+        <div class="col"><span class="v">{{ b.valor }}</span>
+          <div class="pista-v"><div class="relleno-v acento" [style.height.%]="b.pct"></div></div>
+          <span class="estrellas etq">{{ b.nombre.length }}★</span></div>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Disponibilidad de tutores por día</h3><span class="small muted">horas · columnas</span></div>
+    <div class="columnas">
+      @for (b of horasDia; track b.nombre) {
+        <div class="col"><span class="v">{{ b.valor | number:'1.0-1' }}</span>
+          <div class="pista-v"><div class="relleno-v" [style.height.%]="b.pct"></div></div>
+          <span class="etq">{{ b.nombre.substring(0, 3) }}</span></div>
+      }
     </div>
   </div>
 
