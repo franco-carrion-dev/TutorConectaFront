@@ -1,0 +1,295 @@
+<div class="page-head">
+  <div><h2>Estadísticas</h2><p>Reportes calculados en la base de datos: 2 por cada tabla del sistema</p></div>
+</div>
+
+<!-- ===================== USUARIOS ===================== -->
+<h3>Usuarios</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Usuarios registrados por mes</h3>
+      <label class="campo corto"><input type="number" [(ngModel)]="anioUsuarios" (ngModelChange)="cargarRegistrosMes()" aria-label="Año"></label>
+    </div>
+    <div class="barras">
+      @for (b of registrosMes; track b.nombre) {
+        <div class="barra-fila"><span class="nom">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor }}</span></div>
+      } @empty { <div class="vacio small">Sin registros en {{ anioUsuarios }}</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Usuarios {{ activo ? 'activos' : 'inactivos' }}</h3>
+      <label class="campo corto">
+        <select [(ngModel)]="activo" (ngModelChange)="cargarUsuariosActivo()" aria-label="Estado">
+          <option [ngValue]="true">Activos</option>
+          <option [ngValue]="false">Inactivos</option>
+        </select>
+      </label>
+    </div>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Registro</th></tr></thead>
+        <tbody>
+          @for (u of usuariosActivo; track u.idUsuario) {
+            <tr><td>{{ u.nombre }} {{ u.apellido }}</td><td class="small">{{ u.email }}</td><td class="small">{{ u.fechaRegistro | date:'dd/MM/yy' }}</td></tr>
+          } @empty { <tr><td colspan="3" class="vacio small">Sin usuarios</td></tr> }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ROLES ===================== -->
+<h3>Roles</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Usuarios por rol</h3></div>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Rol</th><th class="num">Total</th><th class="num">Activos</th><th class="num">Inactivos</th></tr></thead>
+        <tbody>
+          @for (r of usuariosRol; track r.idRol) {
+            <tr><td>{{ r.denominacion }}</td><td class="num">{{ r.totalUsuarios }}</td><td class="num">{{ r.activos }}</td><td class="num">{{ r.inactivos }}</td></tr>
+          } @empty { <tr><td colspan="4" class="vacio small">Sin datos</td></tr> }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Porcentaje de usuarios por rol</h3></div>
+    <div class="barras">
+      @for (b of porcentajeRol; track b.nombre) {
+        <div class="barra-fila"><span class="nom">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno acento" [style.width.%]="b.pct"></div></div>
+          <span class="v">{{ b.valor | number:'1.0-1' }}% <span class="muted small">({{ b.extra }})</span></span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TUTORES ===================== -->
+<h3>Tutores</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Ingresos por tutor</h3><span class="small muted">pagos completados</span></div>
+    <div class="barras">
+      @for (b of ingresosTutor; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.nombre">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno verde" [style.width.%]="b.pct"></div></div>
+          <span class="v">{{ b.valor | currency:'PEN':'S/ ':'1.0-0' }} <span class="muted small">({{ b.extra }})</span></span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Tutores por rango de tarifa</h3></div>
+    <div class="filtros">
+      <label class="campo corto">Mín. S/<input type="number" min="0" [(ngModel)]="tarifaMin" (ngModelChange)="buscarTutoresTarifa()"></label>
+      <label class="campo corto">Máx. S/<input type="number" min="0" [(ngModel)]="tarifaMax" (ngModelChange)="buscarTutoresTarifa()"></label>
+    </div>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Tutor</th><th class="num">Tarifa/hora</th><th>Verificado</th></tr></thead>
+        <tbody>
+          @for (t of tutoresTarifa; track t.idTutor) {
+            <tr><td>{{ nombre(t.idUsuario) }}</td><td class="num">{{ t.tarifaPorHora | currency:'PEN':'S/ ' }}</td><td>{{ t.verificado ? 'Sí' : 'No' }}</td></tr>
+          } @empty { <tr><td colspan="3" class="vacio small">Ningún tutor en ese rango</td></tr> }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ESTUDIANTES ===================== -->
+<h3>Estudiantes</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Gasto total por estudiante</h3><span class="small muted">pagos completados</span></div>
+    <div class="barras">
+      @for (b of gastosEstudiante; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.nombre">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno" [style.width.%]="b.pct"></div></div>
+          <span class="v">{{ b.valor | currency:'PEN':'S/ ':'1.0-0' }} <span class="muted small">({{ b.extra }})</span></span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Estudiantes por presupuesto</h3></div>
+    <div class="filtros">
+      <label class="campo corto">Presupuesto mínimo S/<input type="number" min="0" [(ngModel)]="presupuesto" (ngModelChange)="buscarEstudiantesPresupuesto()"></label>
+    </div>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Estudiante</th><th class="num">Presupuesto máx.</th></tr></thead>
+        <tbody>
+          @for (e of estudiantesPresupuesto; track e.idEstudiante) {
+            <tr><td>{{ nombre(e.idUsuario) }}</td><td class="num">{{ e.presupuestoMaximo | currency:'PEN':'S/ ' }}</td></tr>
+          } @empty { <tr><td colspan="2" class="vacio small">Ningún estudiante con ese presupuesto</td></tr> }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MATERIAS ===================== -->
+<h3>Materias</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Sesiones por materia</h3><span class="small muted">sin canceladas</span></div>
+    <div class="barras">
+      @for (b of sesionesMateria; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.extra">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno acento" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor }}</span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Tutores por materia</h3></div>
+    <div class="barras">
+      @for (b of tutoresMateria; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.extra">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor }}</span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SESIONES ===================== -->
+<h3>Sesiones</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Sesiones por estado</h3></div>
+    <div class="barras">
+      @for (b of sesionesEstado; track b.nombre) {
+        <div class="barra-fila"><span class="nom">{{ b.nombre | etiqueta }}</span>
+          <div class="pista"><div class="relleno" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor }}</span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Sesiones por rango de fechas</h3></div>
+    <div class="filtros">
+      <label class="campo corto">Desde<input type="date" [(ngModel)]="desde" (ngModelChange)="buscarSesionesRango()"></label>
+      <label class="campo corto">Hasta<input type="date" [(ngModel)]="hasta" (ngModelChange)="buscarSesionesRango()"></label>
+    </div>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Fecha</th><th>Materia</th><th>Tutor</th><th>Estado</th></tr></thead>
+        <tbody>
+          @for (s of sesionesRango; track s.idSesion) {
+            <tr><td class="small">{{ s.fechaInicio | date:'dd/MM/yy HH:mm' }}</td><td>{{ nombreMateria(s.idMateria) }}</td>
+              <td>{{ nombre(s.idTutor) }}</td><td><span class="chip" [class]="s.estado">{{ s.estado | etiqueta }}</span></td></tr>
+          } @empty { <tr><td colspan="4" class="vacio small">Sin sesiones en ese rango</td></tr> }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DISPONIBILIDAD ===================== -->
+<h3>Disponibilidad horaria</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Horas disponibles por día</h3><span class="small muted">horas</span></div>
+    <div class="barras">
+      @for (b of horasDia; track b.nombre) {
+        <div class="barra-fila"><span class="nom">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno verde" [style.width.%]="b.pct"></div></div>
+          <span class="v">{{ b.valor | number:'1.0-1' }} h <span class="muted small">({{ b.extra }})</span></span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Horas disponibles por tutor</h3><span class="small muted">a la semana</span></div>
+    <div class="barras">
+      @for (b of horasTutor; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.nombre">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno" [style.width.%]="b.pct"></div></div>
+          <span class="v">{{ b.valor | number:'1.0-1' }} h <span class="muted small">({{ b.extra }})</span></span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGOS ===================== -->
+<h3>Pagos</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Recaudado por método de pago</h3><span class="small muted">pagos completados</span></div>
+    <div class="barras">
+      @for (b of pagosMetodo; track b.nombre) {
+        <div class="barra-fila"><span class="nom">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno verde" [style.width.%]="b.pct"></div></div>
+          <span class="v">{{ b.valor | currency:'PEN':'S/ ':'1.0-0' }} <span class="muted small">({{ b.extra }})</span></span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Recaudado por mes</h3>
+      <label class="campo corto"><input type="number" [(ngModel)]="anioPagos" (ngModelChange)="cargarPagosMes()" aria-label="Año"></label>
+    </div>
+    <div class="barras">
+      @for (b of pagosMes; track b.nombre) {
+        <div class="barra-fila"><span class="nom">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno acento" [style.width.%]="b.pct"></div></div>
+          <span class="v">{{ b.valor | currency:'PEN':'S/ ':'1.0-0' }} <span class="muted small">({{ b.extra }})</span></span></div>
+      } @empty { <div class="vacio small">Sin pagos en {{ anioPagos }}</div> }
+    </div>
+  </div>
+</div>
+
+<!-- ===================== CALIFICACIONES ===================== -->
+<h3>Calificaciones</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Promedio por tutor</h3><span class="small muted">sobre 5</span></div>
+    <div class="barras">
+      @for (b of promedioTutor; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.nombre">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno acento" [style.width.%]="b.pct"></div></div>
+          <span class="v">{{ b.valor | number:'1.1-2' }} <span class="muted small">({{ b.extra }})</span></span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Calificaciones por puntuación</h3></div>
+    <div class="barras">
+      @for (b of puntuaciones; track b.nombre) {
+        @let e = num(b.nombre) | estrellas;
+        <div class="barra-fila"><span class="nom estrellas">{{ e.on }}<span class="off">{{ e.off }}</span></span>
+          <div class="pista"><div class="relleno" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor }}</span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+</div>
+
+<!-- ===================== REPORTES DE PROGRESO ===================== -->
+<h3>Reportes de progreso</h3>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h3>Reportes por nivel de progreso</h3></div>
+    <div class="barras">
+      @for (b of progresoNivel; track b.nombre) {
+        <div class="barra-fila"><span class="nom">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno verde" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor }}</span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Reportes de progreso por materia</h3></div>
+    <div class="barras">
+      @for (b of progresoMateria; track b.nombre) {
+        <div class="barra-fila"><span class="nom" [title]="b.extra">{{ b.nombre }}</span>
+          <div class="pista"><div class="relleno" [style.width.%]="b.pct"></div></div><span class="v">{{ b.valor }}</span></div>
+      } @empty { <div class="vacio small">Sin datos</div> }
+    </div>
+  </div>
+</div>
