@@ -8,6 +8,7 @@ interface Item { ruta: string; texto: string; icono: string }
 const MENU: Record<string, Item[]> = {
   ADMIN: [
     { ruta: '/admin/dashboard', texto: 'Reportes y dashboard', icono: 'insights' },
+    { ruta: '/admin/estadisticas', texto: 'Estadísticas', icono: 'bar_chart' },
     { ruta: '/admin/usuarios', texto: 'Usuarios', icono: 'group' },
     { ruta: '/admin/roles', texto: 'Roles', icono: 'admin_panel_settings' },
     { ruta: '/admin/tutores', texto: 'Tutores', icono: 'school' },

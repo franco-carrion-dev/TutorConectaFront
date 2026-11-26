@@ -4,6 +4,7 @@ import { Layoutcomponent } from './shared/layoutcomponent';
 import { Logincomponent } from './pages/auth/logincomponent';
 import { Registrocomponent } from './pages/auth/registrocomponent';
 import { Dashboardcomponent } from './pages/admin/dashboardcomponent';
+import { Estadisticascomponent } from './pages/admin/estadisticas/estadisticascomponent';
 import { Ulistcomponent } from './pages/admin/usuarios/ulistcomponent';
 import { Uinsertcomponent } from './pages/admin/usuarios/uinsertcomponent';
 import { Rlistcomponent } from './pages/admin/roles/rlistcomponent';
@@ -54,6 +55,7 @@ export const routes: Routes = [
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
           { path: 'dashboard', component: Dashboardcomponent },
+          { path: 'estadisticas', component: Estadisticascomponent },
           ...crud('usuarios', Ulistcomponent, Uinsertcomponent),
           ...crud('roles', Rlistcomponent, Rinsertcomponent),
           ...crud('materias', Mlistcomponent, Minsertcomponent),
